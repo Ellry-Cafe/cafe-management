@@ -1,55 +1,59 @@
 import { AdminLayout } from '../../layouts/AdminLayout'
+import { CircleDollarSign, Banknote } from 'lucide-react'
 
 export function AdminDashboard() {
   return (
     <AdminLayout>
       <div className="space-y-8">
-        <h1 className="text-2xl font-medium">Dashboard</h1>
+
+        <div >
+          <h1 className="text-2xl font-medium text-black">Board</h1>
+          
+        </div>
+        
 
         {/* Stats Cards */}
         <div className="grid grid-cols-4 gap-6">
           {/* Welcome Card */}
           <div className="bg-white rounded-lg p-6 text-center">
-            <div className="text-orange-400 mb-4">
+            <div className="text-green-500 mb-4">
               <svg className="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
               </svg>
             </div>
             <div className="text-3xl font-bold text-gray-800">2,500</div>
-            <div className="text-gray-500 mt-1">Welcome</div>
+            <div className="text-gray-500 mt-1">Staff</div>
           </div>
 
-          {/* Average Time Card */}
+          {/* Sales Card */}
           <div className="bg-white rounded-lg p-6 text-center">
             <div className="text-blue-400 mb-4">
               <svg className="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
               </svg>
             </div>
             <div className="text-3xl font-bold text-gray-800">123.50</div>
-            <div className="text-gray-500 mt-1">Average Time</div>
+            <div className="text-gray-500 mt-1">Sales</div>
           </div>
 
-          {/* Collections Card */}
+          {/* Expenses Card */}
           <div className="bg-white rounded-lg p-6 text-center">
-            <div className="text-teal-400 mb-4">
-              <svg className="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3zm-9-3.82l-2.09-2.09L6.5 13.5 10 17l6.01-6.01-1.41-1.41z" />
-              </svg>
+            <div className="text-amber-500 mb-4">
+              <Banknote className="w-8 h-8 mx-auto" strokeWidth={1.5} />
             </div>
-            <div className="text-3xl font-bold text-gray-800">1,805</div>
-            <div className="text-gray-500 mt-1">Collections</div>
+            <div className="text-3xl font-bold text-gray-800">₱1,805</div>
+            <div className="text-gray-500 mt-1">Expenses</div>
           </div>
 
-          {/* Comments Card */}
+          {/* Bookings Card */}
           <div className="bg-white rounded-lg p-6 text-center">
             <div className="text-pink-400 mb-4">
               <svg className="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
               </svg>
             </div>
             <div className="text-3xl font-bold text-gray-800">54</div>
-            <div className="text-gray-500 mt-1">Comments</div>
+            <div className="text-gray-500 mt-1">Bookings</div>
           </div>
         </div>
 

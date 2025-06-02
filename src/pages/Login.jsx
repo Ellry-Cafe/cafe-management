@@ -53,7 +53,7 @@ export function Login() {
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-gray-700 text-sm font-medium mb-2">
+            <label className="block text-gray-700 text-sm font-normal mb-2">
               Email Address
             </label>
             <input
@@ -61,7 +61,7 @@ export function Login() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500  focus:border-gray-500"
               placeholder="Enter your email"
               required
               disabled={loading}
@@ -69,7 +69,7 @@ export function Login() {
           </div>
 
           <div>
-            <label className="block text-gray-700 text-sm font-medium mb-2">
+            <label className="block text-gray-700 text-sm font-normal mb-2">
               Password
             </label>
             <input
@@ -77,7 +77,7 @@ export function Login() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
               placeholder="Enter your password"
               required
               disabled={loading}

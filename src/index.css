@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Poppins, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -15,54 +15,87 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.bg-navy-dark {
+  background-color: #101e2d;
+}
+.bg-navy {
+  background-color: #15283c;
+}
+.hover-navy:hover {
+  background-color: #15283c;
+  color: #fff;
+}
+.text-navy {
+  color: #15283c;
+}
+.bg-orange {
+  background-color: #ff5722;
+}
+.hover-orange:hover {
+  background-color: #ff5722;
+  color: #fff;
+}
+.text-orange {
+  color: #ff5722;
+}
+.hover-menu-board:hover, .hover-menu-board:focus, .hover-menu-board:active {
+  background-color: #19314c;
+  border-radius: 4px;
+  & span {color: #ffa726;}
+}
+.hover-menu-user:hover, .hover-menu-user:focus, .hover-menu-user:active { 
+  background-color: #19314c;
+  border-radius: 4px;
+  & span {color: #e25702;}
+}
+.hover-menu-staff:hover, .hover-menu-staff:focus, .hover-menu-staff:active { 
+  background-color: #19314c;
+  border-radius: 4px;
+  & span {color: #66dc7e;}
+}
+.hover-menu-sales:hover, .hover-menu-sales:focus, .hover-menu-sales:active { 
+  background-color: #19314c;
+  border-radius: 4px;
+  & span {color: #60a5fa;}
+}
+.hover-menu-inventory:hover, .hover-menu-inventory:focus, .hover-menu-inventory:active { 
+  background-color: #19314c;
+  border-radius: 4px;
+  & span {color: #c084fc;}
+}
+.hover-menu-booking:hover, .hover-menu-booking:focus, .hover-menu-booking:active { 
+  background-color: #19314c;
+  border-radius: 4px;
+  & span {color: #f472b6;}
+}
+.hover-menu-boarding:hover, .hover-menu-boarding:focus, .hover-menu-boarding:active { 
+  background-color: #19314c;
+  border-radius: 4px;
+  & span {color: #facc15;}
+}
+
+/* Custom Scrollbar Styles */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 20px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
+
+/* Hide scrollbar for Firefox */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #4a5568 transparent;
+}
 
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
