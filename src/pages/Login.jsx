@@ -61,7 +61,7 @@ export function Login() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500  focus:border-gray-500"
+              className="w-full px-4 py-3 rounded-sm bg-gray-100 focus:bg-white focus:ring-1 focus:ring-amber-500 focus:outline-none text-gray-700 disabled:text-gray-500"
               placeholder="Enter your email"
               required
               disabled={loading}
@@ -77,7 +77,7 @@ export function Login() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+              className="w-full px-4 py-3 rounded-sm bg-gray-100 focus:bg-white focus:ring-1 focus:ring-amber-500 focus:outline-none text-gray-700 disabled:text-gray-500"
               placeholder="Enter your password"
               required
               disabled={loading}
@@ -93,7 +93,7 @@ export function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 px-4 bg-amber-600 text-white rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
