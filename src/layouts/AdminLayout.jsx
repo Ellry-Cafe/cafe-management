@@ -3,6 +3,7 @@ import useAuth from '../hooks/useAuth'
 import { useState } from 'react'
 import logo from '../assets/logo-cm.png'
 import { LayoutDashboard, Users, UserCog, Receipt, Package, Calendar, Home } from 'lucide-react'
+import { Outlet } from 'react-router-dom'
 
 // Custom Peso Receipt Icon
 const PesoReceipt = ({ className }) => (
@@ -25,7 +26,7 @@ const PesoReceipt = ({ className }) => (
   </svg>
 )
 
-export function AdminLayout({ children }) {
+function AdminLayout() {
   const { signOut, user } = useAuth()
   const navigate = useNavigate()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -172,10 +173,14 @@ export function AdminLayout({ children }) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6 bg-gray-100">
+        {/* <main className="flex-1 overflow-auto p-6 bg-gray-100">
           {children}
+        </main> */}
+        <main className="flex-1 overflow-auto p-6 bg-gray-100">
+          <Outlet />
         </main>
       </div>
     </div>
   )
 } 
+export default AdminLayout;

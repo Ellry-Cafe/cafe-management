@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { DEFAULT_ROUTE } from '../config/roles'
 import useAuth from '../hooks/useAuth'
 
-export function Login() {
+function Login() {
   const navigate = useNavigate()
   const { signIn, user } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -45,15 +45,20 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-navy">
       <div className="bg-white rounded-lg w-[480px] p-8 shadow-md">
-        <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">
+        <h1 className="text-3xl font-bold text-center text-navy mb-6">
           Cafe Management System
         </h1>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+            <div className="text-sm text-red-500 bg-red-100 border border-red-600 p-2 rounded">
+              {error}
+            </div>
+          )}
           <div>
-            <label className="block text-gray-700 text-sm font-normal mb-2">
+            <label className="block text-navy text-sm font-normal mb-2">
               Email Address
             </label>
             <input
@@ -61,7 +66,7 @@ export function Login() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-sm bg-gray-100 focus:bg-white focus:ring-1 focus:ring-amber-500 focus:outline-none text-gray-700 disabled:text-gray-500"
+              className="w-full px-4 py-3 rounded-sm bg-gray-100 text-black focus:bg-white focus:ring-1 focus:ring-black focus:outline-none disabled:opacity-50"
               placeholder="Enter your email"
               required
               disabled={loading}
@@ -69,7 +74,7 @@ export function Login() {
           </div>
 
           <div>
-            <label className="block text-gray-700 text-sm font-normal mb-2">
+            <label className="block text-navy text-sm font-normal mb-2">
               Password
             </label>
             <input
@@ -77,32 +82,29 @@ export function Login() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-sm bg-gray-100 focus:bg-white focus:ring-1 focus:ring-amber-500 focus:outline-none text-gray-700 disabled:text-gray-500"
+              className="w-full px-4 py-3 rounded-sm bg-gray-100 text-black focus:bg-white focus:ring-1 focus:ring-black focus:outline-none disabled:opacity-50"
               placeholder="Enter your password"
               required
               disabled={loading}
             />
           </div>
 
-          {error && (
-            <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
-              {error}
-            </div>
-          )}
+          
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-amber-600 text-white rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-lg font-bold w-full py-3 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-700 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          Contact your administrator for account access
+        <div className="mt-6 text-center text-sm text-navy">
+          Contact your <b>administrator</b> for account access
         </div>
       </div>
     </div>
   )
 } 
+export default Login;
