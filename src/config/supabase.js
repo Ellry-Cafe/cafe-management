@@ -57,4 +57,4 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 console.log('Supabase client initialized successfully')
 
-export { supabase } 
+export default supabase 

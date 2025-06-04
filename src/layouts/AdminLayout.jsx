@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import useAuth from '../hooks/useAuth'
 import { useState } from 'react'
 import logo from '../assets/logo-cm.png'
@@ -29,7 +29,15 @@ const PesoReceipt = ({ className }) => (
 function AdminLayout() {
   const { signOut, user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+  const isActive = (path) => {
+    if (path === '/admin') {
+      return location.pathname === '/admin'
+    }
+    return location.pathname.startsWith(path)
+  }
 
   const handleSignOut = async () => {
     try {
@@ -60,58 +68,86 @@ function AdminLayout() {
           <div className="space-y-1">
             <Link
               to="/admin"
-              className="flex flex-col items-center px-2 py-3 hover-menu-board"
+              className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
+                isActive('/admin')
+                  ? 'bg-amber-500/10 text-amber-500'
+                  : 'hover:bg-gray-800'
+              }`}
             >
-              <LayoutDashboard className="w-6 h-6 mb-2 text-amber-500" />
-              <span className="text-xs text-white">Board</span>
+              <LayoutDashboard className={`w-6 h-6 mb-2 ${isActive('/admin') ? 'text-amber-500' : 'text-amber-500/70'}`} />
+              <span className={`text-xs ${isActive('/admin') ? 'text-amber-500' : 'text-white'}`}>Board</span>
             </Link>
 
             <Link
               to="/admin/users"
-              className="flex flex-col items-center px-2 py-3 hover-menu-user"
+              className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
+                isActive('/admin/users')
+                  ? 'bg-orange-600/10 text-orange-600'
+                  : 'hover:bg-gray-800'
+              }`}
             >
-              <Users className="w-6 h-6 mb-2 text-orange-600" />
-              <span className="text-xs text-white">Users</span>
+              <Users className={`w-6 h-6 mb-2 ${isActive('/admin/users') ? 'text-orange-600' : 'text-orange-600/70'}`} />
+              <span className={`text-xs ${isActive('/admin/users') ? 'text-orange-600' : 'text-white'}`}>Users</span>
             </Link>
 
             <Link
               to="/admin/staff"
-              className="flex flex-col items-center px-2 py-3 hover-menu-staff"
+              className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
+                isActive('/admin/staff')
+                  ? 'bg-green-400/10 text-green-400'
+                  : 'hover:bg-gray-800'
+              }`}
             >
-              <UserCog className="w-6 h-6 mb-2 text-green-400" />
-              <span className="text-xs text-white">Staff</span>
+              <UserCog className={`w-6 h-6 mb-2 ${isActive('/admin/staff') ? 'text-green-400' : 'text-green-400/70'}`} />
+              <span className={`text-xs ${isActive('/admin/staff') ? 'text-green-400' : 'text-white'}`}>Staff</span>
             </Link>
 
             <Link
               to="/admin/sales"
-              className="flex flex-col items-center px-2 py-3 hover-menu-sales"
+              className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
+                isActive('/admin/sales')
+                  ? 'bg-blue-400/10 text-blue-400'
+                  : 'hover:bg-gray-800'
+              }`}
             >
-              <PesoReceipt className="w-6 h-6 mb-2 text-blue-400" />
-              <span className="text-xs text-white">Sales</span>
+              <PesoReceipt className={`w-6 h-6 mb-2 ${isActive('/admin/sales') ? 'text-blue-400' : 'text-blue-400/70'}`} />
+              <span className={`text-xs ${isActive('/admin/sales') ? 'text-blue-400' : 'text-white'}`}>Sales</span>
             </Link>
 
             <Link
               to="/admin/inventory"
-              className="flex flex-col items-center px-2 py-3 hover-menu-inventory"
+              className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
+                isActive('/admin/inventory')
+                  ? 'bg-purple-400/10 text-purple-400'
+                  : 'hover:bg-gray-800'
+              }`}
             >
-              <Package className="w-6 h-6 mb-2 text-purple-400" />
-              <span className="text-xs text-white">Inventory</span>
+              <Package className={`w-6 h-6 mb-2 ${isActive('/admin/inventory') ? 'text-purple-400' : 'text-purple-400/70'}`} />
+              <span className={`text-xs ${isActive('/admin/inventory') ? 'text-purple-400' : 'text-white'}`}>Inventory</span>
             </Link>
 
             <Link
               to="/admin/booking"
-              className="flex flex-col items-center px-2 py-3 hover-menu-booking"
+              className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
+                isActive('/admin/booking')
+                  ? 'bg-pink-400/10 text-pink-400'
+                  : 'hover:bg-gray-800'
+              }`}
             >
-              <Calendar className="w-6 h-6 mb-2 text-pink-400" />
-              <span className="text-xs text-white">Booking</span>
+              <Calendar className={`w-6 h-6 mb-2 ${isActive('/admin/booking') ? 'text-pink-400' : 'text-pink-400/70'}`} />
+              <span className={`text-xs ${isActive('/admin/booking') ? 'text-pink-400' : 'text-white'}`}>Booking</span>
             </Link>
 
             <Link
               to="/admin/boarding-house"
-              className="flex flex-col items-center px-2 py-3 hover-menu-boarding"
+              className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
+                isActive('/admin/boarding-house')
+                  ? 'bg-yellow-400/10 text-yellow-400'
+                  : 'hover:bg-gray-800'
+              }`}
             >
-              <Home className="w-6 h-6 mb-2 text-yellow-400" />
-              <span className="text-xs text-white">Boarding House</span>
+              <Home className={`w-6 h-6 mb-2 ${isActive('/admin/boarding-house') ? 'text-yellow-400' : 'text-yellow-400/70'}`} />
+              <span className={`text-xs ${isActive('/admin/boarding-house') ? 'text-yellow-400' : 'text-white'}`}>Boarding House</span>
             </Link>
           </div>
         </nav>

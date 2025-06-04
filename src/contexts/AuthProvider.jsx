@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { supabase } from '../config/supabase'
+import supabase from '../config/supabase'
 import { AuthContext } from './AuthContext'
 
 export function AuthProvider({ children }) {
