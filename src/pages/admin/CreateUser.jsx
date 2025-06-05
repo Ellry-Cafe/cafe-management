@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { UserPlus, User, Mail, Lock, UserCircle } from 'lucide-react'
 import { toast, Toaster } from 'react-hot-toast'
-import supabase from '../../config/supabase'
-
+import { supabaseAdmin } from '../../config/supabase'
 
 function CreateUser() {
   const initialFormState = {
@@ -29,69 +28,43 @@ function CreateUser() {
     setLoading(true)
 
     try {
-      console.log('Starting user creation with data:', formData)
+      console.log('Creating new user:', {
+        email: formData.email,
+        role: formData.role,
+        name: formData.name
+      })
       
-      // First, create the auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Create auth user with metadata using admin client
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            name: formData.name,
-            username: formData.username,
-            role: formData.role,
-          },
-        },
+        email_confirm: true,
+        user_metadata: {
+          name: formData.name,
+          username: formData.username,
+          role: formData.role,
+        }
       })
 
       if (authError) {
-        console.error('Auth Error:', authError)
-        toast.error(authError.message)
-        setLoading(false)
+        console.error('Failed to create user:', authError)
+        toast.error(authError.message || 'Failed to create user')
         return
       }
 
-      console.log('Auth user created:', authData)
-
-      if (!authData.user?.id) {
-        toast.error('Failed to create user account')
-        setLoading(false)
-        return
+      if (!authData.user) {
+        throw new Error('No user data received')
       }
 
-      // Then, update or create the profile
-      console.log('Updating profile for user:', authData.user.id)
-      
-      // Match exact table structure from Supabase
-      const profileData = {
+      console.log('User created successfully:', {
         id: authData.user.id,
-        name: formData.name,
-        email: formData.email,
-        role: formData.role,
-        username: formData.username,
-        password: formData.password,
-        created_at: new Date().toISOString()
-      }
-      
-      console.log('Profile data to upsert:', profileData)
+        email: authData.user.email,
+        role: authData.user.user_metadata.role
+      })
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert(profileData, {
-          onConflict: 'id',
-          returning: 'minimal'
-        })
-
-      if (profileError) {
-        console.error('Profile Error:', profileError)
-        toast.error(profileError.message)
-        setLoading(false)
-        return
-      }
-
-      console.log('Profile updated successfully')
       toast.success('User created successfully!')
       resetForm()
+
     } catch (error) {
       console.error('Error creating user:', error)
       toast.error(error.message || 'Error creating user')
@@ -203,10 +176,11 @@ function CreateUser() {
                       placeholder="••••••••"
                       required
                       autoComplete="new-password"
+                      minLength={6}
                     />
                   </div>
                   <p className="mt-1 text-xs text-gray-500">
-                    Password must be at least 8 characters long
+                    Password must be at least 6 characters long
                   </p>
                 </div>
               </div>

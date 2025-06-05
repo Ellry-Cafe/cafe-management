@@ -1,60 +1,89 @@
-import { createClient } from '@supabase/supabase-js'
+import * as supabaseClient from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://ksehteheheizhrylwrxr.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzZWh0ZWhlaGVpemhyeWx3cnhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2MjI5OTUsImV4cCI6MjA2NDE5ODk5NX0.A6I2w65qoNg_rc5ytvGp0gO4rRY56YcAQRCepnHI4yg'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase URL or Anonymous Key')
+// Debug environment variables (without exposing actual keys)
+console.log('Checking Supabase environment variables:', {
+  url: !!supabaseUrl,
+  anonKey: !!supabaseAnonKey,
+  serviceKey: !!supabaseServiceKey,
+  urlLength: supabaseUrl?.length,
+  anonKeyLength: supabaseAnonKey?.length,
+  serviceKeyLength: supabaseServiceKey?.length
+})
+
+if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
+  console.error('Missing Supabase environment variables:', {
+    url: !!supabaseUrl,
+    anonKey: !!supabaseAnonKey,
+    serviceKey: !!supabaseServiceKey
+  })
+  throw new Error('Missing required environment variables')
 }
 
-console.log('Initializing Supabase client...')
+console.log('Initializing Supabase clients...')
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Regular client for normal operations
+const supabase = supabaseClient.createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false,
-    storage: {
-      getItem: (key) => {
-        if (typeof window === 'undefined') return null
-        return window.sessionStorage.getItem(key)
-      },
-      setItem: (key, value) => {
-        if (typeof window === 'undefined') return
-        window.sessionStorage.setItem(key, value)
-      },
-      removeItem: (key) => {
-        if (typeof window === 'undefined') return
-        window.sessionStorage.removeItem(key)
-      },
-    },
+    detectSessionInUrl: true,
+    storage: window?.localStorage,
+    storageKey: 'cafe-management-auth',
+    debug: import.meta.env.DEV
   },
   global: {
-    headers: {
-      'x-application-name': 'cafe-management'
-    }
-  },
-  realtime: {
-    timeout: 5000,
-    params: {
-      eventsPerSecond: 1
-    }
-  },
-  db: {
-    schema: 'public'
+    headers: { 'x-application-name': 'cafe-management' }
   }
 })
 
-// Clear any existing sessions on initialization
-if (typeof window !== 'undefined') {
-  window.sessionStorage.removeItem('supabase.auth.token')
-}
-
-// Test the connection
-supabase.auth.onAuthStateChange((event, session) => {
-  console.log('Supabase auth state changed:', event, session ? 'Has session' : 'No session')
+// Admin client for privileged operations
+const supabaseAdmin = supabaseClient.createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: false, // Don't persist admin sessions
+    storage: undefined, // Don't store admin credentials
+  },
+  global: {
+    headers: { 'x-application-name': 'cafe-management-admin' }
+  }
 })
 
-console.log('Supabase client initialized successfully')
+// Test the connection immediately
+const testConnection = async () => {
+  try {
+    console.log('Testing Supabase connection...')
+    const { error } = await supabase.from('profiles').select('count').limit(1)
+    
+    if (error) {
+      console.error('❌ Supabase connection test failed:', error.message)
+      return false
+    }
+    
+    // Also test admin client
+    const { error: adminError } = await supabaseAdmin.auth.getUser()
+    if (adminError) {
+      console.error('❌ Supabase admin connection test failed:', adminError.message)
+      return false
+    }
+    
+    console.log('✅ Supabase connections successful!')
+    return true
+  } catch (err) {
+    console.error('❌ Supabase connection test error:', err.message)
+    return false
+  }
+}
 
+// Test connection on initialization
+testConnection().then(isConnected => {
+  if (!isConnected) {
+    console.warn('⚠️ Initial connection test failed. Please check your environment variables and network connection.')
+  }
+})
+
+export { supabaseAdmin }
 export default supabase 

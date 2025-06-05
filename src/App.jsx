@@ -9,6 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import AdminLayout from './layouts/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import CreateUser from './pages/admin/CreateUser'
+import Users from './pages/admin/Users'
 import Login from './pages/Login'
 
 function App() {
@@ -30,7 +31,8 @@ function App() {
               }
             >
               <Route index element={<Dashboard />} />
-              <Route path="users" element={<CreateUser />} />
+              <Route path="users" element={<Users />} />
+              <Route path="users/create" element={<CreateUser />} />
             </Route>
 
             {/* Redirect to login */}

@@ -1,0 +1,340 @@
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { 
+  UserPlus, 
+  Search, 
+  Filter, 
+  Edit2, 
+  Trash2, 
+  ChevronLeft, 
+  ChevronRight,
+  AlertCircle
+} from 'lucide-react'
+import { toast, Toaster } from 'react-hot-toast'
+import { supabaseAdmin } from '../../config/supabase'
+
+function Users() {
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [roleFilter, setRoleFilter] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState(null)
+  
+  const PAGE_SIZE = 10
+
+  // Fetch users with pagination, search and filter
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      console.log('Fetching users with params:', {
+        page: currentPage,
+        searchTerm,
+        roleFilter
+      })
+      
+      let query = supabaseAdmin
+        .from('profiles')
+        .select('*', { count: 'exact' })
+        
+      // Apply search filter
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%`)
+      }
+      
+      // Apply role filter
+      if (roleFilter) {
+        query = query.eq('role', roleFilter)
+      }
+      
+      // Apply pagination
+      const from = (currentPage - 1) * PAGE_SIZE
+      const to = from + PAGE_SIZE - 1
+
+      console.log('Executing query with range:', { from, to })
+      
+      const { data, count, error } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to)
+      
+      console.log('Query response:', { data, count, error })
+      
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
+      
+      if (!data) {
+        console.warn('No data received from Supabase')
+        setUsers([])
+        setTotalPages(0)
+        return
+      }
+      
+      console.log('Setting users:', data)
+      setUsers(data)
+      setTotalPages(Math.ceil((count || 0) / PAGE_SIZE))
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      toast.error(`Failed to load users: ${error.message}`)
+      setUsers([])
+      setTotalPages(0)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Initial fetch and refetch when filters change
+  useEffect(() => {
+    fetchUsers()
+  }, [currentPage, searchTerm, roleFilter])
+
+  // Handle delete user
+  const handleDeleteUser = async (userId) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId)
+
+      if (error) throw error
+
+      toast.success('User deleted successfully')
+      fetchUsers() // Refresh the list
+      setDeleteModalOpen(false)
+      setUserToDelete(null)
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      toast.error('Failed to delete user')
+    }
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <Toaster position="top-right" />
+      
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+        <Link
+          to="/admin/users/create"
+          className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+        >
+          <UserPlus className="w-5 h-5 mr-2" />
+          Add User
+        </Link>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        {/* Search */}
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+            />
+          </div>
+        </div>
+
+        {/* Role Filter */}
+        <div className="sm:w-48">
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 appearance-none"
+            >
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="staff">Staff</option>
+              <option value="cashier">Cashier</option>
+              <option value="manager">Manager</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Username
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-4 text-center">
+                    <div className="flex justify-center items-center space-x-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-600"></div>
+                      <span>Loading users...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : users.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                    No users found
+                  </td>
+                </tr>
+              ) : (
+                users.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {user.name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{user.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{user.username}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : ''}
+                        ${user.role === 'staff' ? 'bg-blue-100 text-blue-800' : ''}
+                        ${user.role === 'cashier' ? 'bg-green-100 text-green-800' : ''}
+                        ${user.role === 'manager' ? 'bg-orange-100 text-orange-800' : ''}
+                      `}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                      <Link
+                        to={`/admin/users/edit/${user.id}`}
+                        className="text-orange-600 hover:text-orange-900 inline-flex items-center"
+                      >
+                        <Edit2 className="w-4 h-4 mr-1" />
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setUserToDelete(user)
+                          setDeleteModalOpen(true)
+                        }}
+                        className="text-red-600 hover:text-red-900 inline-flex items-center ml-2"
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+            <div className="flex-1 flex justify-between sm:hidden">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700">
+                  Showing page <span className="font-medium">{currentPage}</span> of{' '}
+                  <span className="font-medium">{totalPages}</span>
+                </p>
+              </div>
+              <div>
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && userToDelete && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3 text-center">
+              <AlertCircle className="mx-auto text-red-600 w-12 h-12" />
+              <h3 className="text-lg leading-6 font-medium text-gray-900">Delete User</h3>
+              <div className="mt-2 px-7 py-3">
+                <p className="text-sm text-gray-500">
+                  Are you sure you want to delete {userToDelete.name}? This action cannot be undone.
+                </p>
+              </div>
+              <div className="flex justify-center gap-4 mt-4">
+                <button
+                  onClick={() => {
+                    setDeleteModalOpen(false)
+                    setUserToDelete(null)
+                  }}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium rounded-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeleteUser(userToDelete.id)}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default Users 
