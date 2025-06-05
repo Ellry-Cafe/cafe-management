@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { toast, Toaster } from 'react-hot-toast'
 import { supabaseAdmin } from '../../config/supabase'
+import CreateUser from './CreateUser'
 
 function Users() {
   const [users, setUsers] = useState([])
@@ -22,6 +23,7 @@ function Users() {
   const [totalPages, setTotalPages] = useState(0)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState(null)
+  const [createModalOpen, setCreateModalOpen] = useState(false)
   
   const PAGE_SIZE = 10
 
@@ -118,13 +120,13 @@ function Users() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-        <Link
-          to="/admin/users/create"
+        <button
+          onClick={() => setCreateModalOpen(true)}
           className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
         >
           <UserPlus className="w-5 h-5 mr-2" />
           Add User
-        </Link>
+        </button>
       </div>
 
       {/* Filters */}
@@ -299,6 +301,15 @@ function Users() {
           </div>
         )}
       </div>
+
+      {/* Create User Modal */}
+      <CreateUser 
+        isOpen={createModalOpen} 
+        onClose={() => {
+          setCreateModalOpen(false)
+          fetchUsers() // Refresh the list after creating a user
+        }} 
+      />
 
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && userToDelete && (
