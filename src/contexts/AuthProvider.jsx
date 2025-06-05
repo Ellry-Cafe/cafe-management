@@ -12,38 +12,33 @@ export function AuthProvider({ children }) {
     if (!authUser?.id) return null
     
     try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('id, role, email, name')
-        .eq('id', authUser.id)
-        .single()
+      // Get role from user metadata instead of querying profiles
+      const role = authUser.user_metadata?.role || 'staff'
+      const name = authUser.user_metadata?.name || authUser.email
+      const username = authUser.user_metadata?.username || authUser.email.split('@')[0]
 
-      if (error) throw error
-      
-      if (!profile?.role) {
-        console.error('No role found for user:', authUser.id)
-        return null
-      }
-
-      // Create user object with role from profile
+      // Create user object with role from metadata
       const userWithRole = {
         ...authUser,
-        role: profile.role, // Use the role directly from the profile
-        email: profile.email,
-        name: profile.name,
-        id: profile.id
+        role,
+        name,
+        username,
+        email: authUser.email,
+        id: authUser.id
       }
 
       return userWithRole
     } catch (error) {
-      console.error('Error fetching user profile:', error)
+      console.error('Error processing user data:', error)
       return null
     }
   }, [])
 
   // Handle auth state changes
   const handleAuthChange = useCallback(async (event, session) => {
-    if (event === 'SIGNED_OUT') {
+    console.log('Auth state changed:', event, session)
+    
+    if (event === 'SIGNED_OUT' || !session) {
       setUser(null)
       setLoading(false)
       return
@@ -71,9 +66,15 @@ export function AuthProvider({ children }) {
     const initialize = async () => {
       try {
         // Get current session
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { session }, error } = await supabase.auth.getSession()
         
+        if (error) {
+          console.error('Session error:', error)
+          return
+        }
+
         if (session?.user && mounted) {
+          console.log('Found existing session:', session)
           const userWithRole = await fetchUserWithRole(session.user)
           if (userWithRole) {
             setUser(userWithRole)
@@ -106,14 +107,22 @@ export function AuthProvider({ children }) {
 
   const signIn = async (email, password) => {
     try {
+      console.log('Attempting sign in for:', email)
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Sign in error:', error)
+        throw error
+      }
 
-      // Auth state change listener will handle updating the user state
+      if (!data.user) {
+        throw new Error('No user returned from sign in')
+      }
+
+      console.log('Sign in successful:', data.user)
       return { user: data.user }
     } catch (error) {
       console.error('Sign in error:', error)
@@ -135,9 +144,6 @@ export function AuthProvider({ children }) {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
 
-      // Clear any cached data
-      window.sessionStorage.clear()
-      
       // Reset loading state
       setLoading(false)
 
