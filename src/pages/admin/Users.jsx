@@ -8,11 +8,13 @@ import {
   Trash2, 
   ChevronLeft, 
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  ShieldAlert
 } from 'lucide-react'
 import { toast, Toaster } from 'react-hot-toast'
 import { supabaseAdmin } from '../../config/supabase'
 import CreateUser from './CreateUser'
+import EditUser from './EditUser'
 
 function Users() {
   const [users, setUsers] = useState([])
@@ -24,6 +26,8 @@ function Users() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [userToEdit, setUserToEdit] = useState(null)
   
   const PAGE_SIZE = 10
 
@@ -54,35 +58,18 @@ function Users() {
       // Apply pagination
       const from = (currentPage - 1) * PAGE_SIZE
       const to = from + PAGE_SIZE - 1
-
-      console.log('Executing query with range:', { from, to })
       
       const { data, count, error } = await query
         .order('created_at', { ascending: false })
         .range(from, to)
       
-      console.log('Query response:', { data, count, error })
+      if (error) throw error
       
-      if (error) {
-        console.error('Supabase error:', error)
-        throw error
-      }
-      
-      if (!data) {
-        console.warn('No data received from Supabase')
-        setUsers([])
-        setTotalPages(0)
-        return
-      }
-      
-      console.log('Setting users:', data)
-      setUsers(data)
+      setUsers(data || [])
       setTotalPages(Math.ceil((count || 0) / PAGE_SIZE))
     } catch (error) {
       console.error('Error fetching users:', error)
-      toast.error(`Failed to load users: ${error.message}`)
-      setUsers([])
-      setTotalPages(0)
+      toast.error('Failed to load users')
     } finally {
       setLoading(false)
     }
@@ -96,20 +83,23 @@ function Users() {
   // Handle delete user
   const handleDeleteUser = async (userId) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId)
+      setLoading(true)
+      
+      // Delete auth user first
+      const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+      if (authError) throw authError
 
-      if (error) throw error
+      // Profile will be deleted automatically by the cascade delete
 
       toast.success('User deleted successfully')
-      fetchUsers() // Refresh the list
       setDeleteModalOpen(false)
       setUserToDelete(null)
+      fetchUsers() // Refresh the list
     } catch (error) {
       console.error('Error deleting user:', error)
       toast.error('Failed to delete user')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -228,13 +218,16 @@ function Users() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <Link
-                        to={`/admin/users/edit/${user.id}`}
+                      <button
+                        onClick={() => {
+                          setUserToEdit(user)
+                          setEditModalOpen(true)
+                        }}
                         className="text-orange-600 hover:text-orange-900 inline-flex items-center"
                       >
                         <Edit2 className="w-4 h-4 mr-1" />
                         Edit
-                      </Link>
+                      </button>
                       <button
                         onClick={() => {
                           setUserToDelete(user)
@@ -307,8 +300,19 @@ function Users() {
         isOpen={createModalOpen} 
         onClose={() => {
           setCreateModalOpen(false)
-          fetchUsers() // Refresh the list after creating a user
+          fetchUsers()
         }} 
+      />
+
+      {/* Edit User Modal */}
+      <EditUser
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false)
+          setUserToEdit(null)
+          fetchUsers()
+        }}
+        user={userToEdit}
       />
 
       {/* Delete Confirmation Modal */}
@@ -316,12 +320,21 @@ function Users() {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3 text-center">
-              <AlertCircle className="mx-auto text-red-600 w-12 h-12" />
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Delete User</h3>
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <ShieldAlert className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">Delete User</h3>
               <div className="mt-2 px-7 py-3">
                 <p className="text-sm text-gray-500">
                   Are you sure you want to delete {userToDelete.name}? This action cannot be undone.
                 </p>
+                {userToDelete.role === 'admin' && (
+                  <div className="mt-2 p-2 bg-yellow-50 rounded-md">
+                    <p className="text-sm text-yellow-800">
+                      Warning: You are about to delete an admin user.
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="flex justify-center gap-4 mt-4">
                 <button
@@ -329,15 +342,26 @@ function Users() {
                     setDeleteModalOpen(false)
                     setUserToDelete(null)
                   }}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium rounded-md"
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium rounded-md transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleDeleteUser(userToDelete.id)}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md"
+                  disabled={loading}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
-                  Delete
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete User'
+                  )}
                 </button>
               </div>
             </div>
