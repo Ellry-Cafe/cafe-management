@@ -10,6 +10,7 @@ import AdminLayout from './layouts/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import Users from './pages/admin/Users'
 import Login from './pages/Login'
+import Staff from './pages/admin/Staff'
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             >
               <Route index element={<Dashboard />} />
               <Route path="users" element={<Users />} />
+              <Route path="staff" element={<Staff />} />
             </Route>
 
             {/* Redirect to login */}
