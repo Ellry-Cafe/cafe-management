@@ -1,145 +1,176 @@
-import { CircleDollarSign, Banknote } from 'lucide-react'
+import PageHeader from '../../components/PageHeader'
+import { Facebook, Twitter, Linkedin, XCircle } from 'lucide-react'
 
 function Dashboard() {
   return (
-    <div className="space-y-8 mt-0">
-      <div>
-        <h1 className="text-2xl font-medium text-black">Board</h1>
-      </div>
+    <div>
+      <PageHeader title="Board">
+        {/* Add any header actions here if needed */}
+      </PageHeader>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-6">
-        {/* Welcome Card */}
-        <div className="bg-white rounded-lg p-6 text-center">
-          <div className="text-green-500 mb-4">
-            <svg className="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-            </svg>
-          </div>
-          <div className="text-3xl font-bold text-gray-800">2,500</div>
-          <div className="text-gray-500 mt-1">Staff</div>
-        </div>
-
-        {/* Sales Card */}
-        <div className="bg-white rounded-lg p-6 text-center">
-          <div className="text-blue-400 mb-4">
-            <svg className="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
-            </svg>
-          </div>
-          <div className="text-3xl font-bold text-gray-800">123.50</div>
-          <div className="text-gray-500 mt-1">Sales</div>
-        </div>
-
-        {/* Expenses Card */}
-        <div className="bg-white rounded-lg p-6 text-center">
-          <div className="text-amber-500 mb-4">
-            <Banknote className="w-8 h-8 mx-auto" strokeWidth={1.5} />
-          </div>
-          <div className="text-3xl font-bold text-gray-800">₱1,805</div>
-          <div className="text-gray-500 mt-1">Expenses</div>
-        </div>
-
-        {/* Bookings Card */}
-        <div className="bg-white rounded-lg p-6 text-center">
-          <div className="text-pink-400 mb-4">
-            <svg className="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-            </svg>
-          </div>
-          <div className="text-3xl font-bold text-gray-800">54</div>
-          <div className="text-gray-500 mt-1">Bookings</div>
-        </div>
-      </div>
-
-      {/* Social Stats */}
-      <div className="grid grid-cols-4 gap-6">
-        {/* Facebook */}
-        <div className="bg-[#4267B2] rounded-lg p-6 text-white">
-          <div className="flex justify-center mb-4">
-            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z" />
-            </svg>
-          </div>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold">35k</div>
-              <div className="text-sm opacity-80">Friends</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold">128</div>
-              <div className="text-sm opacity-80">Feeds</div>
+      <div className="px-8 py-4">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Staff Card */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-500">Staff</span>
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <svg className="w-6 h-6 text-green-500" viewBox="0 0 24 24" fill="none">
+                    <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="text-2xl font-semibold text-gray-900">2,500</div>
+              <div className="text-sm text-gray-500 mt-2">Total staff members</div>
             </div>
           </div>
-        </div>
 
-        {/* Twitter */}
-        <div className="bg-[#1DA1F2] rounded-lg p-6 text-white">
-          <div className="flex justify-center mb-4">
-            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z" />
-            </svg>
-          </div>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold">584k</div>
-              <div className="text-sm opacity-80">Followers</div>
+          {/* Sales Card */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-500">Sales</span>
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <svg className="w-6 h-6 text-blue-500" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="text-2xl font-semibold text-gray-900">₱123.50</div>
+              <div className="text-sm text-gray-500 mt-2">Today's total sales</div>
             </div>
-            <div>
-              <div className="text-2xl font-bold">978</div>
-              <div className="text-sm opacity-80">Tweets</div>
+          </div>
+
+          {/* Expenses Card */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-500">Expenses</span>
+                <div className="p-2 bg-amber-50 rounded-lg">
+                  <svg className="w-6 h-6 text-amber-500" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 1V23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="text-2xl font-semibold text-gray-900">₱1,805</div>
+              <div className="text-sm text-gray-500 mt-2">Total expenses today</div>
+            </div>
+          </div>
+
+          {/* Bookings Card */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-500">Bookings</span>
+                <div className="p-2 bg-purple-50 rounded-lg">
+                  <svg className="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M3 10H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="text-2xl font-semibold text-gray-900">54</div>
+              <div className="text-sm text-gray-500 mt-2">Active bookings</div>
             </div>
           </div>
         </div>
 
-        {/* LinkedIn */}
-        <div className="bg-[#0077B5] rounded-lg p-6 text-white">
-          <div className="flex justify-center mb-4">
-            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
-            </svg>
-          </div>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold">758+</div>
-              <div className="text-sm opacity-80">Contacts</div>
+        {/* Social Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Facebook Card */}
+          <div className="bg-[#1877F2] bg-opacity-10 p-6 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center">
+                  <Facebook className="w-5 h-5 text-[#1877F2] mr-2" />
+                  <span className="text-sm font-medium text-gray-900">Facebook</span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-2xl font-bold text-gray-900">35k</span>
+                  <span className="text-sm text-gray-500 ml-2">Friends</span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-sm text-gray-500">128 Feeds</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="text-2xl font-bold">365</div>
-              <div className="text-sm opacity-80">Feeds</div>
+          </div>
+
+          {/* Twitter Card */}
+          <div className="bg-[#1DA1F2] bg-opacity-10 p-6 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center">
+                  <Twitter className="w-5 h-5 text-[#1DA1F2] mr-2" />
+                  <span className="text-sm font-medium text-gray-900">Twitter</span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-2xl font-bold text-gray-900">584k</span>
+                  <span className="text-sm text-gray-500 ml-2">Followers</span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-sm text-gray-500">978 Tweets</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* LinkedIn Card */}
+          <div className="bg-[#0A66C2] bg-opacity-10 p-6 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center">
+                  <Linkedin className="w-5 h-5 text-[#0A66C2] mr-2" />
+                  <span className="text-sm font-medium text-gray-900">LinkedIn</span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-2xl font-bold text-gray-900">758+</span>
+                  <span className="text-sm text-gray-500 ml-2">Contacts</span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-sm text-gray-500">365 Feeds</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* X (Twitter) Card */}
+          <div className="bg-black bg-opacity-10 p-6 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center">
+                  <XCircle className="w-5 h-5 text-gray-900 mr-2" />
+                  <span className="text-sm font-medium text-gray-900">X</span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-2xl font-bold text-gray-900">450</span>
+                  <span className="text-sm text-gray-500 ml-2">Followers</span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-sm text-gray-500">57 Circles</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Google */}
-        <div className="bg-[#DB4437] rounded-lg p-6 text-white">
-          <div className="flex justify-center mb-4">
-            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
-            </svg>
+        {/* Chart Area */}
+        <div className="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+          <div className="text-center text-gray-500 py-12">
+            Chart will be implemented here
           </div>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold">450</div>
-              <div className="text-sm opacity-80">Followers</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold">57</div>
-              <div className="text-sm opacity-80">Circles</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Area Chart */}
-      <div className="bg-white rounded-lg p-6">
-        <h2 className="text-xl font-medium mb-6">Extra Area Chart</h2>
-        <div className="h-64 flex items-center justify-center text-gray-400">
-          Chart will be implemented here
         </div>
       </div>
     </div>
   )
 }
 
-export default Dashboard;
+export default Dashboard
