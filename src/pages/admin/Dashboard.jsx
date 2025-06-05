@@ -2,7 +2,7 @@ import { CircleDollarSign, Banknote } from 'lucide-react'
 
 function Dashboard() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-0">
       <div>
         <h1 className="text-2xl font-medium text-black">Board</h1>
       </div>

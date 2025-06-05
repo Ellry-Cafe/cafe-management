@@ -212,7 +212,7 @@ function AdminLayout() {
         {/* <main className="flex-1 overflow-auto p-6 bg-gray-100">
           {children}
         </main> */}
-        <main className="flex-1 overflow-auto p-6 bg-gray-100">
+        <main className="flex-1 overflow-auto bg-gray-100">
           <Outlet />
         </main>
       </div>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { 
   UserPlus, 
   Search, 
@@ -15,6 +14,7 @@ import { toast, Toaster } from 'react-hot-toast'
 import { supabaseAdmin } from '../../config/supabase'
 import CreateUser from './CreateUser'
 import EditUser from './EditUser'
+import PageHeader from '../../components/PageHeader'
 
 function Users() {
   const [users, setUsers] = useState([])
@@ -104,58 +104,60 @@ function Users() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div>
       <Toaster position="top-right" />
       
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+      {/* Page Header */}
+      <PageHeader title="Users">
         <button
           onClick={() => setCreateModalOpen(true)}
-          className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-amber-400 text-gray-800 rounded-lg hover:bg-amber-500 transition-colors"
         >
           <UserPlus className="w-5 h-5 mr-2" />
           Add User
         </button>
-      </div>
+      </PageHeader>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        {/* Search */}
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-            />
+      {/* Main Content */}
+      <div className="px-8 py-4">
+        {/* Filters */}
+        <div className="pb-8 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white"
+                />
+              </div>
+            </div>
+
+            {/* Role Filter */}
+            <div className="sm:w-48">
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 appearance-none bg-white text-gray-800"
+                >
+                  <option value="">All Roles</option>
+                  <option value="admin">Admin</option>
+                  <option value="staff">Staff</option>
+                  <option value="cashier">Cashier</option>
+                  <option value="manager">Manager</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Role Filter */}
-        <div className="sm:w-48">
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 appearance-none"
-            >
-              <option value="">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="staff">Staff</option>
-              <option value="cashier">Cashier</option>
-              <option value="manager">Manager</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Users Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {/* Users Table */}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -223,7 +225,7 @@ function Users() {
                           setUserToEdit(user)
                           setEditModalOpen(true)
                         }}
-                        className="text-orange-600 hover:text-orange-900 inline-flex items-center"
+                        className="text-blue-600 hover:text-orange-900 inline-flex items-center"
                       >
                         <Edit2 className="w-4 h-4 mr-1" />
                         Edit
