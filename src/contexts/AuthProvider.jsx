@@ -12,31 +12,31 @@ export function AuthProvider({ children }) {
     if (!authUser?.id) return null
     
     try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
+      const { data: userData, error } = await supabase
+        .from('users')
         .select('id, role, email, name')
         .eq('id', authUser.id)
         .single()
 
       if (error) throw error
       
-      if (!profile?.role) {
+      if (!userData?.role) {
         console.error('No role found for user:', authUser.id)
         return null
       }
 
-      // Create user object with role from profile
+      // Create user object with role from user data
       const userWithRole = {
         ...authUser,
-        role: profile.role, // Use the role directly from the profile
-        email: profile.email,
-        name: profile.name,
-        id: profile.id
+        role: userData.role,
+        email: userData.email,
+        name: userData.name,
+        id: userData.id
       }
 
       return userWithRole
     } catch (error) {
-      console.error('Error fetching user profile:', error)
+      console.error('Error fetching user data:', error)
       return null
     }
   }, [])

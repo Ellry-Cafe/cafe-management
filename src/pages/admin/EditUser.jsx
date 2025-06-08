@@ -78,9 +78,9 @@ function EditUser({ isOpen, onClose, user }) {
         ...formData
       })
       
-      // Update profile data
-      const { error: profileError } = await supabaseAdmin
-        .from('profiles')
+      // Update user data
+      const { error: userError } = await supabaseAdmin
+        .from('users')
         .update({
           name: formData.name,
           email: formData.email,
@@ -89,7 +89,7 @@ function EditUser({ isOpen, onClose, user }) {
         })
         .eq('id', user.id)
 
-      if (profileError) throw profileError
+      if (userError) throw userError
 
       // Prepare auth update data
       const authUpdateData = {

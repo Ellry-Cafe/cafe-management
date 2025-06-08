@@ -42,7 +42,7 @@ function Users() {
       })
       
       let query = supabaseAdmin
-        .from('profiles')
+        .from('users')
         .select('*', { count: 'exact' })
         
       // Apply search filter
