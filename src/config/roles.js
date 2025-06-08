@@ -7,9 +7,8 @@ export const ROLES = {
 
 export const ROLE_ROUTES = {
   [ROLES.ADMIN]: ['/admin', '/admin/users', '/admin/menu', '/admin/orders'],
-  [ROLES.STAFF]: ['/staff', '/staff/orders', '/staff/menu'],
   [ROLES.CASHIER]: ['/cashier', '/cashier/orders', '/cashier/menu'],
-  [ROLES.MANAGER]: ['/manager', '/manager/reports', '/manager/staff', '/manager/menu']
+  [ROLES.MANAGER]: ['/manager', '/manager/reports', '/manager/menu']
 }
 
 export const DEFAULT_ROUTE = {

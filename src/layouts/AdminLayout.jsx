@@ -82,24 +82,12 @@ function AdminLayout() {
               to="/admin/users"
               className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
                 isActive('/admin/users')
-                  ? 'bg-orange-600/10 text-orange-600'
+                  ? 'bg-orange-400/10 text-orange-400'
                   : 'hover:bg-gray-800'
               }`}
             >
-              <Users className={`w-6 h-6 mb-2 ${isActive('/admin/users') ? 'text-orange-600' : 'text-orange-600/70'}`} />
-              <span className={`text-xs ${isActive('/admin/users') ? 'text-orange-600' : 'text-white'}`}>Users</span>
-            </Link>
-
-            <Link
-              to="/admin/staff"
-              className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
-                isActive('/admin/staff')
-                  ? 'bg-green-400/10 text-green-400'
-                  : 'hover:bg-gray-800'
-              }`}
-            >
-              <UserCog className={`w-6 h-6 mb-2 ${isActive('/admin/staff') ? 'text-green-400' : 'text-green-400/70'}`} />
-              <span className={`text-xs ${isActive('/admin/staff') ? 'text-green-400' : 'text-white'}`}>Staff</span>
+              <Users className={`w-6 h-6 mb-2 ${isActive('/admin/users') ? 'text-orange-400' : 'text-orange-400/70'}`} />
+              <span className={`text-xs ${isActive('/admin/users') ? 'text-orange-400' : 'text-white'}`}>Users</span>
             </Link>
 
             <Link
