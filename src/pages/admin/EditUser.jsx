@@ -2,15 +2,23 @@ import { useState, useEffect } from 'react'
 import { UserPlus, User, Mail, Lock, UserCircle, X, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { supabaseAdmin } from '../../config/supabase'
+import UserFileManager from '../../components/UserFileManager'
 
 function EditUser({ isOpen, onClose, user }) {
   const [formData, setFormData] = useState({
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     username: '',
     role: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    contact_number: '',
+    emergency_contact: '',
+    birthdate: '',
+    present_address: '',
+    department: '',
+    start_date: ''
   })
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -20,19 +28,26 @@ function EditUser({ isOpen, onClose, user }) {
   useEffect(() => {
     if (user) {
       setFormData({
-        name: user.name || '',
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
         email: user.email || '',
         username: user.username || '',
         role: user.role || '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        contact_number: user.contact_number || '',
+        emergency_contact: user.emergency_contact || '',
+        birthdate: user.birthdate || '',
+        present_address: user.present_address || '',
+        department: user.department || '',
+        start_date: user.start_date || ''
       })
     }
   }, [user])
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const validatePasswords = () => {
@@ -82,37 +97,46 @@ function EditUser({ isOpen, onClose, user }) {
       const { error: userError } = await supabaseAdmin
         .from('users')
         .update({
-          name: formData.name,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           email: formData.email,
           username: formData.username,
           role: formData.role,
+          contact_number: formData.contact_number,
+          emergency_contact: formData.emergency_contact,
+          birthdate: formData.birthdate,
+          present_address: formData.present_address,
+          department: formData.department,
+          start_date: formData.start_date,
+          name: `${formData.first_name} ${formData.last_name}`.trim()
         })
         .eq('id', user.id)
 
       if (userError) throw userError
 
-      // Prepare auth update data
-      const authUpdateData = {
-        email: formData.email,
-        user_metadata: {
-          name: formData.name,
-          username: formData.username,
-          role: formData.role,
+      // Update auth user data if needed
+      if (formData.password || formData.email !== user.email) {
+        const authUpdateData = {
+          email: formData.email,
+          user_metadata: {
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            username: formData.username,
+            role: formData.role
+          }
         }
+
+        if (formData.password) {
+          authUpdateData.password = formData.password
+        }
+
+        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(
+          user.id,
+          authUpdateData
+        )
+
+        if (authError) throw authError
       }
-
-      // Add password to update data if provided
-      if (formData.password) {
-        authUpdateData.password = formData.password
-      }
-
-      // Update auth user metadata and optionally password
-      const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(
-        user.id,
-        authUpdateData
-      )
-
-      if (authError) throw authError
 
       toast.success('User updated successfully!')
       onClose() // Close the modal after successful update
@@ -129,7 +153,7 @@ function EditUser({ isOpen, onClose, user }) {
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-5 mx-auto p-5 border w-[600px] shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
+      <div className="relative top-5 mx-auto p-5 border w-[800px] shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <UserPlus className="w-6 h-6 text-orange-600" />
@@ -144,154 +168,232 @@ function EditUser({ isOpen, onClose, user }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Full Name */}
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
-              </div>
+          {/* Personal Information */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                First Name
+              </label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="first_name"
+                value={formData.first_name}
                 onChange={handleChange}
-                className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="John Doe"
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Last Name
+              </label>
+              <input
+                type="text"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                required
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Contact Number
+              </label>
+              <input
+                type="tel"
+                name="contact_number"
+                value={formData.contact_number}
+                onChange={handleChange}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Emergency Contact
+              </label>
+              <input
+                type="tel"
+                name="emergency_contact"
+                value={formData.emergency_contact}
+                onChange={handleChange}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Birthdate
+              </label>
+              <input
+                type="date"
+                name="birthdate"
+                value={formData.birthdate}
+                onChange={handleChange}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Present Address
+              </label>
+              <input
+                type="text"
+                name="present_address"
+                value={formData.present_address}
+                onChange={handleChange}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
           </div>
 
-          {/* Email */}
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Email Address
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
-              </div>
+          {/* Account Information */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="john@example.com"
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               />
             </div>
-          </div>
 
-          {/* Username */}
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Username
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <UserCircle className="h-5 w-5 text-gray-400" />
-              </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Username
+              </label>
               <input
                 type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="johndoe"
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
-                autoComplete="off"
               />
             </div>
-          </div>
 
-          {/* Password */}
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              New Password (Optional)
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                New Password (Optional)
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  placeholder="Leave blank to keep current"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
               </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="block w-full pl-10 pr-12 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Leave blank to keep current"
-                autoComplete="new-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                )}
-              </button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
-              Must be at least 6 characters long
-            </p>
-          </div>
 
-          {/* Confirm Password */}
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Confirm New Password
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Confirm New Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  placeholder="Leave blank to keep current"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
               </div>
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="block w-full pl-10 pr-12 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Leave blank to keep current"
-                autoComplete="new-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                )}
-              </button>
             </div>
           </div>
 
-          {/* Role Selection */}
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Role
-            </label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="block w-full pl-4 pr-10 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-              required
-            >
-              <option value="">Select a role</option>
-              <option value="cashier">Cashier</option>
-              <option value="staff">Staff</option>
-              <option value="manager">Manager</option>
-            </select>
+          {/* Employment Information */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Role
+              </label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                required
+              >
+                <option value="">Select a role</option>
+                <option value="admin">Admin</option>
+                <option value="barista">Barista</option>
+                <option value="cashier">Cashier</option>
+                <option value="cook">Cook</option>
+                <option value="assistant_cook">Assistant Cook</option>
+                <option value="manager">Manager</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Department
+              </label>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+              >
+                <option value="">Select department</option>
+                <option value="kitchen">Kitchen</option>
+                <option value="service">Service</option>
+                <option value="management">Management</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Start Date
+              </label>
+              <input
+                type="date"
+                name="start_date"
+                value={formData.start_date}
+                onChange={handleChange}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
+          </div>
+
+          {/* File Management */}
+          <div className="mt-8">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">File Management</h3>
+            <UserFileManager userId={user.id} />
           </div>
 
           {/* Submit Button */}

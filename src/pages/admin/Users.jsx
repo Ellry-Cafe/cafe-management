@@ -8,7 +8,10 @@ import {
   ChevronLeft, 
   ChevronRight,
   AlertCircle,
-  ShieldAlert
+  ShieldAlert,
+  FileText,
+  FileCheck,
+  FileX
 } from 'lucide-react'
 import { toast, Toaster } from 'react-hot-toast'
 import { supabaseAdmin } from '../../config/supabase'
@@ -19,31 +22,40 @@ import PageHeader from '../../components/PageHeader'
 function Users() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [userToEdit, setUserToEdit] = useState(null)
   
   const PAGE_SIZE = 10
 
-  // Fetch users with pagination, search and filter
+  useEffect(() => {
+    fetchUsers()
+  }, [currentPage, searchTerm, roleFilter])
+
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      console.log('Fetching users with params:', {
-        page: currentPage,
-        searchTerm,
-        roleFilter
-      })
       
       let query = supabaseAdmin
         .from('users')
-        .select('*', { count: 'exact' })
+        .select(`
+          *,
+          user_files (
+            id,
+            file_id,
+            is_active,
+            files (
+              file_type,
+              file_name
+            )
+          )
+        `, { count: 'exact' })
         
       // Apply search filter
       if (searchTerm) {
@@ -64,9 +76,9 @@ function Users() {
         .range(from, to)
       
       if (error) throw error
-      
+
       setUsers(data || [])
-      setTotalPages(Math.ceil((count || 0) / PAGE_SIZE))
+      setTotalCount(count || 0)
     } catch (error) {
       console.error('Error fetching users:', error)
       toast.error('Failed to load users')
@@ -75,10 +87,30 @@ function Users() {
     }
   }
 
-  // Initial fetch and refetch when filters change
-  useEffect(() => {
-    fetchUsers()
-  }, [currentPage, searchTerm, roleFilter])
+  const handleEditUser = (user) => {
+    setSelectedUser(user)
+    setIsEditModalOpen(true)
+  }
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false)
+    setSelectedUser(null)
+    fetchUsers() // Refresh the list after editing
+  }
+
+  const getFileStatus = (user) => {
+    const requiredFiles = ['profile_photo', 'id_photo', 'resume', 'contract']
+    const userFiles = user.user_files || []
+    const activeFiles = userFiles.filter(uf => uf.is_active).map(uf => uf.files.file_type)
+    
+    const missingFiles = requiredFiles.filter(type => !activeFiles.includes(type))
+    
+    return {
+      complete: missingFiles.length === 0,
+      missingCount: missingFiles.length,
+      missingTypes: missingFiles
+    }
+  }
 
   // Handle delete user
   const handleDeleteUser = async (userId) => {
@@ -131,7 +163,10 @@ function Users() {
                   type="text"
                   placeholder="Search users..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value)
+                    setCurrentPage(1)
+                  }}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white"
                 />
               </div>
@@ -143,7 +178,10 @@ function Users() {
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <select
                   value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
+                  onChange={(e) => {
+                    setRoleFilter(e.target.value)
+                    setCurrentPage(1)
+                  }}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 appearance-none bg-white text-gray-800"
                 >
                   <option value="">All Roles</option>
@@ -175,6 +213,12 @@ function Users() {
                   Role
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Department
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Documents
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -196,60 +240,78 @@ function Users() {
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {user.name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{user.email}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{user.username}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : ''}
-                        ${user.role === 'staff' ? 'bg-blue-100 text-blue-800' : ''}
-                        ${user.role === 'cashier' ? 'bg-green-100 text-green-800' : ''}
-                        ${user.role === 'manager' ? 'bg-orange-100 text-orange-800' : ''}
-                      `}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <button
-                        onClick={() => {
-                          setUserToEdit(user)
-                          setEditModalOpen(true)
-                        }}
-                        className="text-blue-600 hover:text-orange-900 inline-flex items-center"
-                      >
-                        <Edit2 className="w-4 h-4 mr-1" />
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          setUserToDelete(user)
-                          setDeleteModalOpen(true)
-                        }}
-                        className="text-red-600 hover:text-red-900 inline-flex items-center ml-2"
-                      >
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                users.map((user) => {
+                  const fileStatus = getFileStatus(user)
+                  return (
+                    <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">{user.email}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">{user.username}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : ''}
+                          ${user.role === 'staff' ? 'bg-blue-100 text-blue-800' : ''}
+                          ${user.role === 'cashier' ? 'bg-green-100 text-green-800' : ''}
+                          ${user.role === 'manager' ? 'bg-orange-100 text-orange-800' : ''}
+                        `}>
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="capitalize">{user.department || '-'}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center space-x-2">
+                          {fileStatus.complete ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <FileCheck className="w-4 h-4 mr-1" />
+                              Complete
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                              <FileX className="w-4 h-4 mr-1" />
+                              {fileStatus.missingCount} missing
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                        <button
+                          onClick={() => handleEditUser(user)}
+                          className="text-blue-600 hover:text-orange-900 inline-flex items-center"
+                        >
+                          <Edit2 className="w-4 h-4 mr-1" />
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            setUserToDelete(user)
+                            setDeleteModalOpen(true)
+                          }}
+                          className="text-red-600 hover:text-red-900 inline-flex items-center ml-2"
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
+        {totalCount > PAGE_SIZE && (
           <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
@@ -260,8 +322,8 @@ function Users() {
                 Previous
               </button>
               <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(totalCount / PAGE_SIZE)))}
+                disabled={currentPage === Math.ceil(totalCount / PAGE_SIZE)}
                 className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
@@ -271,7 +333,7 @@ function Users() {
               <div>
                 <p className="text-sm text-gray-700">
                   Showing page <span className="font-medium">{currentPage}</span> of{' '}
-                  <span className="font-medium">{totalPages}</span>
+                  <span className="font-medium">{Math.ceil(totalCount / PAGE_SIZE)}</span>
                 </p>
               </div>
               <div>
@@ -284,8 +346,8 @@ function Users() {
                     <ChevronLeft className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(totalCount / PAGE_SIZE)))}
+                    disabled={currentPage === Math.ceil(totalCount / PAGE_SIZE)}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ChevronRight className="h-5 w-5" />
@@ -307,15 +369,13 @@ function Users() {
       />
 
       {/* Edit User Modal */}
-      <EditUser
-        isOpen={editModalOpen}
-        onClose={() => {
-          setEditModalOpen(false)
-          setUserToEdit(null)
-          fetchUsers()
-        }}
-        user={userToEdit}
-      />
+      {isEditModalOpen && selectedUser && (
+        <EditUser
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          user={selectedUser}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && userToDelete && (
