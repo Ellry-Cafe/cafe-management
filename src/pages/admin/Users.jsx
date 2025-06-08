@@ -19,6 +19,28 @@ import CreateUser from './CreateUser'
 import EditUser from './EditUser'
 import PageHeader from '../../components/PageHeader'
 
+const ROLE_STYLES = {
+  admin: 'bg-purple-100 text-purple-800',
+  staff: 'bg-blue-100 text-blue-800',
+  cashier: 'bg-green-100 text-green-800',
+  manager: 'bg-orange-100 text-orange-800',
+  barista: 'bg-pink-100 text-pink-800',
+  cook: 'bg-yellow-100 text-yellow-800',
+  assistant_cook: 'bg-amber-100 text-amber-800',
+  dining_crew: 'bg-teal-100 text-teal-800',
+  kitchen_crew: 'bg-cyan-100 text-cyan-800',
+  inventory_manager: 'bg-indigo-100 text-indigo-800',
+  supervisor: 'bg-rose-100 text-rose-800'
+}
+
+const DEPARTMENTS = {
+  service: 'Service',
+  kitchen: 'Kitchen',
+  management: 'Management',
+  dining: 'Dining',
+  inventory: 'Inventory'
+}
+
 function Users() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -184,11 +206,17 @@ function Users() {
                   }}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 appearance-none bg-white text-gray-800"
                 >
-                  <option value="">All Roles</option>
-                  <option value="admin">Admin</option>
-                  <option value="staff">Staff</option>
-                  <option value="cashier">Cashier</option>
-                  <option value="manager">Manager</option>
+                  <option value="">Select a role</option>
+                <option value="admin">Admin</option>
+                <option value="barista">Barista</option>
+                <option value="cashier">Cashier</option>
+                <option value="cook">Cook</option>
+                <option value="assistant_cook">Assistant Cook</option>
+                <option value="dining_crew">Dining Crew</option>
+                <option value="kitchen_crew">Kitchen Crew</option>
+                <option value="inventory_manager">Inventory Manager</option>
+                <option value="manager">Manager</option>
+                <option value="supervisor">Supervisor</option>
                 </select>
               </div>
             </div>
@@ -256,17 +284,14 @@ function Users() {
                         <div className="text-sm text-gray-500">{user.username}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                          ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : ''}
-                          ${user.role === 'staff' ? 'bg-blue-100 text-blue-800' : ''}
-                          ${user.role === 'cashier' ? 'bg-green-100 text-green-800' : ''}
-                          ${user.role === 'manager' ? 'bg-orange-100 text-orange-800' : ''}
-                        `}>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${ROLE_STYLES[user.role] || 'bg-gray-100 text-gray-800'}`}>
                           {user.role}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="capitalize">{user.department || '-'}</span>
+                        <span className={`inline-flex text-sm ${user.department ? 'text-gray-900' : 'text-gray-500'}`}>
+                          {user.department ? DEPARTMENTS[user.department] || user.department : '-'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center space-x-2">

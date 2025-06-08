@@ -3,13 +3,23 @@ import { UserPlus, User, Mail, Lock, UserCircle, X } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { supabaseAdmin } from '../../config/supabase'
 
+const DEPARTMENTS = {
+  service: 'Service',
+  kitchen: 'Kitchen',
+  management: 'Management',
+  dining: 'Dining',
+  inventory: 'Inventory'
+}
+
 function CreateUser({ isOpen, onClose }) {
   const initialFormState = {
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     username: '',
     password: '',
     role: '',
+    department: ''
   }
   const [formData, setFormData] = useState(initialFormState)
   const [loading, setLoading] = useState(false)
@@ -28,10 +38,13 @@ function CreateUser({ isOpen, onClose }) {
     setLoading(true)
 
     try {
+      const fullName = `${formData.first_name} ${formData.last_name}`.trim()
+      
       console.log('Creating new user:', {
         email: formData.email,
         role: formData.role,
-        name: formData.name
+        name: fullName,
+        department: formData.department
       })
       
       // Create auth user with metadata using admin client
@@ -40,9 +53,12 @@ function CreateUser({ isOpen, onClose }) {
         password: formData.password,
         email_confirm: true,
         user_metadata: {
-          name: formData.name,
+          name: fullName,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           username: formData.username,
           role: formData.role,
+          department: formData.department
         }
       })
 
@@ -56,10 +72,29 @@ function CreateUser({ isOpen, onClose }) {
         throw new Error('No user data received')
       }
 
+      // Update the user's profile with department and name fields
+      const { error: profileError } = await supabaseAdmin
+        .from('users')
+        .update({ 
+          department: formData.department,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          name: fullName
+        })
+        .eq('id', authData.user.id)
+
+      if (profileError) {
+        console.error('Failed to update profile:', profileError)
+        toast.error('User created but failed to set profile information')
+        return
+      }
+
       console.log('User created successfully:', {
         id: authData.user.id,
         email: authData.user.email,
-        role: authData.user.user_metadata.role
+        role: authData.user.user_metadata.role,
+        department: formData.department,
+        name: fullName
       })
 
       toast.success('User created successfully!')
@@ -93,24 +128,48 @@ function CreateUser({ isOpen, onClose }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Full Name */}
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
+          {/* Name Row */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* First Name */}
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                First Name
+              </label>
+              <div className="relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  placeholder="John"
+                  required
+                />
               </div>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="John Doe"
-                required
-              />
+            </div>
+
+            {/* Last Name */}
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Last Name
+              </label>
+              <div className="relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  placeholder="Doe"
+                  required
+                />
+              </div>
             </div>
           </div>
 
@@ -135,74 +194,101 @@ function CreateUser({ isOpen, onClose }) {
             </div>
           </div>
 
-          {/* Username and Password Row */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Username */}
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <div className="relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <UserCircle className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                  placeholder="johndoe"
-                  required
-                  autoComplete="off"
-                />
+          {/* Username */}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Username
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <UserCircle className="h-5 w-5 text-gray-400" />
               </div>
-            </div>
-
-            {/* Password */}
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                  placeholder="••••••••"
-                  required
-                  autoComplete="new-password"
-                  minLength={6}
-                />
-              </div>
-              <p className="mt-1 text-xs text-gray-500">
-                Password must be at least 6 characters long
-              </p>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="johndoe"
+                required
+              />
             </div>
           </div>
 
-          {/* Role Selection */}
+          {/* Password */}
           <div className="space-y-1">
             <label className="block text-sm font-medium text-gray-700">
-              Role
+              Password
             </label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="block w-full pl-4 pr-10 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-              required
-            >
-              <option value="">Select a role</option>
-              <option value="cashier">Cashier</option>
-              <option value="staff">Staff</option>
-              <option value="manager">Manager</option>
-            </select>
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="••••••••"
+                required
+                autoComplete="new-password"
+                minLength={6}
+              />
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Password must be at least 6 characters long
+            </p>
+          </div>
+
+          {/* Role and Department Row */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Role Selection */}
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Role
+              </label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="block w-full pl-4 pr-10 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                required
+              >
+                <option value="">Select a role</option>
+                <option value="admin">Admin</option>
+                <option value="barista">Barista</option>
+                <option value="cashier">Cashier</option>
+                <option value="cook">Cook</option>
+                <option value="assistant_cook">Assistant Cook</option>
+                <option value="dining_crew">Dining Crew</option>
+                <option value="kitchen_crew">Kitchen Crew</option>
+                <option value="inventory_manager">Inventory Manager</option>
+                <option value="manager">Manager</option>
+                <option value="supervisor">Supervisor</option>
+              </select>
+            </div>
+
+            {/* Department Selection */}
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Department
+              </label>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                className="block w-full pl-4 pr-10 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                required
+              >
+                <option value="">Select a department</option>
+                {Object.entries(DEPARTMENTS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Submit Button */}

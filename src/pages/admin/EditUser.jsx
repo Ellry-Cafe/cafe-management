@@ -4,6 +4,14 @@ import { toast } from 'react-hot-toast'
 import { supabaseAdmin } from '../../config/supabase'
 import UserFileManager from '../../components/UserFileManager'
 
+const DEPARTMENTS = {
+  service: 'Service',
+  kitchen: 'Kitchen',
+  management: 'Management',
+  dining: 'Dining',
+  inventory: 'Inventory'
+}
+
 function EditUser({ isOpen, onClose, user }) {
   const [formData, setFormData] = useState({
     first_name: '',
@@ -122,7 +130,8 @@ function EditUser({ isOpen, onClose, user }) {
             first_name: formData.first_name,
             last_name: formData.last_name,
             username: formData.username,
-            role: formData.role
+            role: formData.role,
+            department: formData.department
           }
         }
 
@@ -355,7 +364,11 @@ function EditUser({ isOpen, onClose, user }) {
                 <option value="cashier">Cashier</option>
                 <option value="cook">Cook</option>
                 <option value="assistant_cook">Assistant Cook</option>
+                <option value="dining_crew">Dining Crew</option>
+                <option value="kitchen_crew">Kitchen Crew</option>
+                <option value="inventory_manager">Inventory Manager</option>
                 <option value="manager">Manager</option>
+                <option value="supervisor">Supervisor</option>
               </select>
             </div>
 
@@ -370,9 +383,11 @@ function EditUser({ isOpen, onClose, user }) {
                 className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="">Select department</option>
-                <option value="kitchen">Kitchen</option>
-                <option value="service">Service</option>
-                <option value="management">Management</option>
+                {Object.entries(DEPARTMENTS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
               </select>
             </div>
 
