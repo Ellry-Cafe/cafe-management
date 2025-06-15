@@ -46,8 +46,6 @@ function Users() {
   const [loading, setLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [roleFilter, setRoleFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -58,7 +56,7 @@ function Users() {
 
   useEffect(() => {
     fetchUsers()
-  }, [currentPage, searchTerm, roleFilter])
+  }, [currentPage])
 
   const fetchUsers = async () => {
     try {
@@ -78,16 +76,6 @@ function Users() {
             )
           )
         `, { count: 'exact' })
-        
-      // Apply search filter
-      if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%`)
-      }
-      
-      // Apply role filter
-      if (roleFilter) {
-        query = query.eq('role', roleFilter)
-      }
       
       // Apply pagination
       const from = (currentPage - 1) * PAGE_SIZE
@@ -160,110 +148,35 @@ function Users() {
   return (
     <div>
       <Toaster position="top-right" />
-      
-      {/* Page Header */}
-      <PageHeader title="Users">
-        <button
-          onClick={() => setCreateModalOpen(true)}
-          className="flex items-center px-4 py-2 bg-amber-400 text-gray-800 rounded-lg hover:bg-amber-500 transition-colors"
-        >
-          <UserPlus className="w-5 h-5 mr-2" />
-          Add User
-        </button>
-      </PageHeader>
 
-      {/* Main Content */}
-      <div className="px-8 py-4">
-        {/* Filters */}
-        <div className="pb-8 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value)
-                    setCurrentPage(1)
-                  }}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white"
-                />
-              </div>
-            </div>
-
-            {/* Role Filter */}
-            <div className="sm:w-48">
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select
-                  value={roleFilter}
-                  onChange={(e) => {
-                    setRoleFilter(e.target.value)
-                    setCurrentPage(1)
-                  }}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 appearance-none bg-white text-gray-800"
-                >
-                  <option value="">Select a role</option>
-                <option value="admin">Admin</option>
-                <option value="barista">Barista</option>
-                <option value="cashier">Cashier</option>
-                <option value="cook">Cook</option>
-                <option value="assistant_cook">Assistant Cook</option>
-                <option value="dining_crew">Dining Crew</option>
-                <option value="kitchen_crew">Kitchen Crew</option>
-                <option value="inventory_manager">Inventory Manager</option>
-                <option value="manager">Manager</option>
-                <option value="supervisor">Supervisor</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Users Table */}
+      {/* Users Table */}
+      <div className="bg-white rounded-lg shadow">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Username
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Department
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Documents
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documents</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 bg-white">
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-4 text-center">
+                  <td colSpan="7" className="px-6 py-4 text-center">
                     <div className="flex justify-center items-center space-x-2">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-600"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-500"></div>
                       <span>Loading users...</span>
                     </div>
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
                     No users found
                   </td>
                 </tr>
@@ -273,9 +186,7 @@ function Users() {
                   return (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.name}
-                        </div>
+                        <div className="text-sm text-gray-900">{user.name}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-500">{user.email}</div>
@@ -284,17 +195,17 @@ function Users() {
                         <div className="text-sm text-gray-500">{user.username}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${ROLE_STYLES[user.role] || 'bg-gray-100 text-gray-800'}`}>
+                        <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full ${ROLE_STYLES[user.role] || 'bg-gray-100 text-gray-800'}`}>
                           {user.role}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex text-sm ${user.department ? 'text-gray-900' : 'text-gray-500'}`}>
+                        <div className="text-sm text-gray-900">
                           {user.department ? DEPARTMENTS[user.department] || user.department : '-'}
-                        </span>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center">
                           {fileStatus.complete ? (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                               <FileCheck className="w-4 h-4 mr-1" />
@@ -308,10 +219,10 @@ function Users() {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={() => handleEditUser(user)}
-                          className="text-blue-600 hover:text-orange-900 inline-flex items-center"
+                          className="text-blue-600 hover:text-blue-900 inline-flex items-center mr-3"
                         >
                           <Edit2 className="w-4 h-4 mr-1" />
                           Edit
@@ -321,7 +232,7 @@ function Users() {
                             setUserToDelete(user)
                             setDeleteModalOpen(true)
                           }}
-                          className="text-red-600 hover:text-red-900 inline-flex items-center ml-2"
+                          className="text-red-600 hover:text-red-900 inline-flex items-center"
                         >
                           <Trash2 className="w-4 h-4 mr-1" />
                           Delete
@@ -334,55 +245,55 @@ function Users() {
             </tbody>
           </table>
         </div>
+      </div>
 
-        {/* Pagination */}
-        {totalCount > PAGE_SIZE && (
-          <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(totalCount / PAGE_SIZE)))}
-                disabled={currentPage === Math.ceil(totalCount / PAGE_SIZE)}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
+      {/* Pagination */}
+      {totalCount > PAGE_SIZE && (
+        <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+          <div className="flex-1 flex justify-between sm:hidden">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(totalCount / PAGE_SIZE)))}
+              disabled={currentPage === Math.ceil(totalCount / PAGE_SIZE)}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Showing page <span className="font-medium">{currentPage}</span> of{' '}
+                <span className="font-medium">{Math.ceil(totalCount / PAGE_SIZE)}</span>
+              </p>
             </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing page <span className="font-medium">{currentPage}</span> of{' '}
-                  <span className="font-medium">{Math.ceil(totalCount / PAGE_SIZE)}</span>
-                </p>
-              </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(totalCount / PAGE_SIZE)))}
-                    disabled={currentPage === Math.ceil(totalCount / PAGE_SIZE)}
-                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                </nav>
-              </div>
+            <div>
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(totalCount / PAGE_SIZE)))}
+                  disabled={currentPage === Math.ceil(totalCount / PAGE_SIZE)}
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </nav>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Create User Modal */}
       <CreateUser 

@@ -8,14 +8,14 @@ import ErrorBoundary from './components/ErrorBoundary'
 // Layout & Pages
 import AdminLayout from './layouts/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
-import Users from './pages/admin/Users'
+import UserManagement from './pages/admin/UserManagement'
 import Login from './pages/Login'
 
 function App() {
   return (
     <ErrorBoundary>
-      <Router>
-        <AuthProvider>
+      <AuthProvider>
+        <Router>
           <Routes>
             {/* Public Route */}
             <Route path="/login" element={<Login />} />
@@ -30,14 +30,14 @@ function App() {
               }
             >
               <Route index element={<Dashboard />} />
-              <Route path="users" element={<Users />} />
+              <Route path="users" element={<UserManagement />} />
             </Route>
 
             {/* Redirect to login */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to="/admin/users" replace />} />
           </Routes>
-        </AuthProvider>
-      </Router>
+        </Router>
+      </AuthProvider>
     </ErrorBoundary>
   )
 }
