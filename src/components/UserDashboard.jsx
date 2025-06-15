@@ -38,7 +38,7 @@ function UserDashboard() {
               {diningStaff.map((staff, index) => (
                 <tr key={index} className="border-t border-gray-100">
                   <td className="py-2 text-gray-600">{staff.time}</td>
-                  <td className="py-2">{staff.name}</td>
+                  <td className="py-2">{`${staff.first_name} ${staff.last_name}`}</td>
                   <td className="py-2">
                     {staff.status && (
                       <span className={`px-2 py-1 text-xs rounded-full ${
@@ -70,7 +70,7 @@ function UserDashboard() {
               {kitchenStaff.map((staff, index) => (
                 <tr key={index} className="border-t border-gray-100">
                   <td className="py-2 text-gray-600">{staff.time}</td>
-                  <td className="py-2">{staff.name}</td>
+                  <td className="py-2">{`${staff.first_name} ${staff.last_name}`}</td>
                 </tr>
               ))}
             </tbody>

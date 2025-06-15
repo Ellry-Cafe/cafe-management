@@ -166,7 +166,7 @@ function EditUser({ isOpen, onClose, user }) {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <UserPlus className="w-6 h-6 text-orange-600" />
-            Edit User: {user.name}
+            Edit User: {`${user.first_name} ${user.last_name}`}
           </h2>
           <button
             onClick={onClose}

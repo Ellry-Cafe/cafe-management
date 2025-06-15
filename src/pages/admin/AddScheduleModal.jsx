@@ -1,180 +1,252 @@
 import { useState, useEffect } from 'react';
-import { addSchedule, updateSchedule } from '../../api/schedules';
+import { addSchedule, deleteSchedulesForStaffDept } from '../../api/schedules';
 import { supabaseAdmin } from '../../config/supabase';
-import { X, CalendarPlus } from 'lucide-react';
+import { X, CalendarPlus, Plus, Trash2 } from 'lucide-react';
 
 const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const departments = ['dining', 'kitchen'];
 
-function AddScheduleModal({ open, onClose, onCreated, editingSchedule }) {
+const defaultShifts = days.reduce((acc, day) => {
+  acc[day] = [{ start: '', end: '' }];
+  return acc;
+}, {});
+
+function generateTimeOptions() {
+  const options = [];
+  let hour = 6;
+  let minute = 0;
+  while (hour < 24) {
+    const ampm = hour < 12 ? 'AM' : 'PM';
+    let displayHour = hour % 12;
+    if (displayHour === 0) displayHour = 12;
+    const displayMinute = minute === 0 ? '00' : '30';
+    options.push(`${displayHour}:${displayMinute} ${ampm}`);
+    minute += 30;
+    if (minute === 60) {
+      minute = 0;
+      hour += 1;
+    }
+  }
+  return options;
+}
+const timeOptions = generateTimeOptions();
+
+export default function AddScheduleModal({ open, onClose, onCreated, editingSchedule }) {
   const [staffList, setStaffList] = useState([]);
   const [staffId, setStaffId] = useState('');
-  const [day, setDay] = useState('monday');
-  const [department, setDepartment] = useState('dining');
-  const [shiftStart, setShiftStart] = useState('');
-  const [shiftEnd, setShiftEnd] = useState('');
+  const [department, setDepartment] = useState('');
+  const [shifts, setShifts] = useState(defaultShifts);
 
   useEffect(() => {
     if (open) {
       supabaseAdmin
         .from('users')
-        .select('id, name')
+        .select('id, first_name, last_name, department')
         .then(({ data }) => setStaffList(data || []));
+      if (editingSchedule) {
+        setStaffId(editingSchedule.staff_id);
+        setDepartment(editingSchedule.department);
+        // Prefill shifts for each day
+        const prefill = days.reduce((acc, day) => {
+          const dayShifts = (editingSchedule.schedules || []).filter(s => s.day_of_week === day);
+          acc[day] = dayShifts.length > 0
+            ? dayShifts.map(s => ({ start: s.shift_start, end: s.shift_end }))
+            : [{ start: '', end: '' }];
+          return acc;
+        }, {});
+        setShifts(prefill);
+      } else {
+        setStaffId('');
+        setDepartment('');
+        setShifts(days.reduce((acc, day) => {
+          acc[day] = [{ start: '', end: '' }];
+          return acc;
+        }, {}));
+      }
     }
-  }, [open]);
+  }, [open, editingSchedule]);
 
-  useEffect(() => {
+  const handleShiftChange = (day, idx, field, value) => {
+    setShifts(prev => ({
+      ...prev,
+      [day]: prev[day].map((shift, i) =>
+        i === idx ? { ...shift, [field]: value } : shift
+      ),
+    }));
+  };
+
+  const handleAddShift = (day) => {
+    setShifts(prev => ({
+      ...prev,
+      [day]: [...prev[day], { start: '', end: '' }],
+    }));
+  };
+
+  const handleRemoveShift = (day, idx) => {
+    setShifts(prev => ({
+      ...prev,
+      [day]: prev[day].filter((_, i) => i !== idx),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!staffId || !department) {
+      alert('Please select both staff and department.');
+      return;
+    }
+    // If editing, delete all old schedules for this staff and department first
     if (editingSchedule) {
-      setStaffId(editingSchedule.staff_id);
-      setDay(editingSchedule.day_of_week);
-      setDepartment(editingSchedule.department || editingSchedule.users?.department || 'dining');
-      setShiftStart(editingSchedule.shift_start ? to24h(editingSchedule.shift_start) : '');
-      setShiftEnd(editingSchedule.shift_end ? to24h(editingSchedule.shift_end) : '');
-    } else {
-      setStaffId('');
-      setDay('monday');
-      setDepartment('dining');
-      setShiftStart('');
-      setShiftEnd('');
+      await deleteSchedulesForStaffDept(staffId, department);
     }
-  }, [editingSchedule, open]);
-
-  function toAmPm(time24) {
-    if (!time24) return '';
-    let [h, m] = time24.split(':');
-    h = parseInt(h, 10);
-    const ap = h >= 12 ? 'pm' : 'am';
-    if (h === 0) h = 12;
-    else if (h > 12) h -= 12;
-    return `${h}:${m}${ap}`;
-  }
-  function to24h(time) {
-    // Converts '8:00am' or '6:00pm' to '08:00' or '18:00'
-    if (!time) return '';
-    const match = time.match(/^(\d{1,2}):(\d{2})(am|pm)$/i);
-    if (match) {
-      let [, h, m, ap] = match;
-      h = parseInt(h, 10);
-      if (ap.toLowerCase() === 'pm' && h !== 12) h += 12;
-      if (ap.toLowerCase() === 'am' && h === 12) h = 0;
-      return `${h.toString().padStart(2, '0')}:${m}`;
+    let saved = false;
+    for (const day of days) {
+      for (const shift of shifts[day]) {
+        if (
+          shift.start &&
+          shift.end
+        ) {
+          const { error } = await addSchedule({
+            staff_id: staffId,
+            department,
+            day_of_week: day,
+            shift_start: shift.start,
+            shift_end: shift.end,
+          });
+          if (error) {
+            alert('Error saving schedule: ' + error.message);
+            return;
+          }
+          saved = true;
+        }
+      }
     }
-    return time;
-  }
+    if (!saved) {
+      alert('No valid shifts to save.');
+      return;
+    }
+    onClose();
+    if (onCreated) onCreated();
+  };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-      <div className="relative w-full max-w-lg mx-auto bg-white rounded-xl shadow-lg p-8">
-        {/* Header */}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold flex items-center gap-2 text-orange-600">
             <CalendarPlus className="w-6 h-6 text-orange-600" />
-            {editingSchedule ? 'Edit Schedule' : 'Create Schedule'}
+            Create Schedule
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-500"
+            className="text-gray-500 hover:text-gray-700"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
-        {/* Form */}
-        <form
-          onSubmit={async e => {
-            e.preventDefault();
-            const formattedStart = toAmPm(shiftStart);
-            const formattedEnd = toAmPm(shiftEnd);
-            if (editingSchedule) {
-              await updateSchedule(editingSchedule.id, {
-                staff_id: staffId,
-                day_of_week: day,
-                shift_start: formattedStart,
-                shift_end: formattedEnd,
-                department
-              });
-            } else {
-              await addSchedule({ staff_id: staffId, day_of_week: day, shift_start: formattedStart, shift_end: formattedEnd, department });
-            }
-            onClose();
-            if (onCreated) onCreated();
-          }}
-          className="space-y-4"
-        >
-          {/* Staff, Day, Department in one row */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-1">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Staff</label>
               <select
-                className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
                 value={staffId}
                 onChange={e => setStaffId(e.target.value)}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               >
                 <option value="">Select staff</option>
                 {staffList.map(staff => (
-                  <option key={staff.id} value={staff.id}>{staff.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Day</label>
-              <select
-                className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
-                value={day}
-                onChange={e => setDay(e.target.value)}
-              >
-                {days.map(d => (
-                  <option key={d} value={d}>
-                    {d.charAt(0).toUpperCase() + d.slice(1)}
+                  <option key={staff.id} value={staff.id}>
+                    {`${staff.first_name || ''} ${staff.last_name || ''}`.trim() || 'Unknown'}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="space-y-1">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
               <select
-                className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
                 value={department}
                 onChange={e => setDepartment(e.target.value)}
+                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               >
+                <option value="">Select department</option>
                 {departments.map(dep => (
                   <option key={dep} value={dep}>{dep.charAt(0).toUpperCase() + dep.slice(1)}</option>
                 ))}
               </select>
             </div>
           </div>
-          {/* Shift Start/End */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Shift Start</label>
-              <input
-                className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
-                value={shiftStart}
-                onChange={e => setShiftStart(e.target.value)}
-                placeholder="e.g. 8:00am"
-                required
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Shift End</label>
-              <input
-                className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
-                value={shiftEnd}
-                onChange={e => setShiftEnd(e.target.value)}
-                placeholder="e.g. 2:00pm"
-                required
-              />
-            </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full mt-4 text-gray-800">
+              <thead>
+                <tr>
+                  <th className="text-left px-2 py-1">Day</th>
+                  <th className="text-left px-2 py-1">Shift Start</th>
+                  <th className="text-left px-2 py-1">Shift End</th>
+                  <th className="px-2 py-1"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {days.map(day => (
+                  <tr key={day}>
+                    <td className="font-medium px-2 py-1 align-top">{day.charAt(0).toUpperCase() + day.slice(1)}</td>
+                    <td colSpan={3} className="p-0">
+                      {shifts[day].map((shift, idx) => (
+                        <div key={idx} className="flex items-center gap-2 mb-1">
+                          <select
+                            value={shift.start}
+                            onChange={e => handleShiftChange(day, idx, 'start', e.target.value)}
+                            className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                          >
+                            <option value="">--:-- --</option>
+                            {timeOptions.map(opt => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
+                          <span>-</span>
+                          <select
+                            value={shift.end}
+                            onChange={e => handleShiftChange(day, idx, 'end', e.target.value)}
+                            className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                          >
+                            <option value="">--:-- --</option>
+                            {timeOptions.map(opt => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
+                          {shifts[day].length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveShift(day, idx)}
+                              className="text-red-500 hover:text-red-700"
+                              title="Remove shift"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => handleAddShift(day)}
+                        className="text-green-600 hover:text-green-800 flex items-center text-xs mt-1 mb-3"
+                      >
+                        <Plus className="w-4 h-4 mr-1" /> Add Shift
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          {/* Buttons */}
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
             >
               Cancel
             </button>
@@ -183,7 +255,7 @@ function AddScheduleModal({ open, onClose, onCreated, editingSchedule }) {
               className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
             >
               <CalendarPlus className="w-5 h-5 mr-2" />
-              {editingSchedule ? 'Update' : 'Add'}
+              Save Schedule
             </button>
           </div>
         </form>
@@ -191,5 +263,3 @@ function AddScheduleModal({ open, onClose, onCreated, editingSchedule }) {
     </div>
   );
 }
-
-export default AddScheduleModal;
