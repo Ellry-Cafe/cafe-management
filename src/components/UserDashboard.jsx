@@ -1,15 +1,28 @@
-function UserDashboard() {
-  const diningStaff = [
-    { time: '8:00 am - 5:30 pm', name: 'Allia', status: 'Out' },
-    { time: '10:00 am - 5:30 pm', name: 'Harlyn', status: 'In' },
-    { time: '5:00 pm - 11:30 pm', name: 'Saysay', status: null }
-  ]
+import { useEffect, useState } from 'react';
+import { getSchedules } from '../api/schedules';
 
-  const kitchenStaff = [
-    { time: '8:00 am - 5:30 pm', name: 'Marco', status: null },
-    { time: '10:00 am - 5:30 pm', name: 'Ian', status: null },
-    { time: '5:00 pm - 11:30 pm', name: 'Val', status: null }
-  ]
+const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+
+function getToday() {
+  return days[new Date().getDay()];
+}
+
+function UserDashboard() {
+  const [diningStaff, setDiningStaff] = useState([]);
+  const [kitchenStaff, setKitchenStaff] = useState([]);
+
+  useEffect(() => {
+    async function fetchOnDuty() {
+      const { data } = await getSchedules();
+      const today = getToday();
+      // Filter for today's shifts
+      const todayShifts = (data || []).filter(s => s.day_of_week === today);
+      // Group by department
+      setDiningStaff(todayShifts.filter(s => (s.department || s.users?.department) === 'dining'));
+      setKitchenStaff(todayShifts.filter(s => (s.department || s.users?.department) === 'kitchen'));
+    }
+    fetchOnDuty();
+  }, []);
 
   const requests = [
     { type: 'Cash Advance', user: 'Marco', amount: '₱1,000', status: 'Pending' },
@@ -19,63 +32,53 @@ function UserDashboard() {
 
   return (
     <div className="grid grid-cols-2 gap-6">
-      {/* Staff Today Section */}
+      {/* Dining Section */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4 text-gray-800">Staff Today</h2>
-        
-        {/* Dining Section */}
-        <div className="mb-6">
-          <h3 className="text-gray-400 mb-2">Dining</h3>
-          <table className="w-full">
-            <thead>
-              <tr className="text-left text-gray-600">
-                <th className="pb-2">Time</th>
-                <th className="pb-2">Name</th>
-                <th className="pb-2">Status</th>
+        <h2 className="text-lg font-semibold mb-4 text-gray-800">Dining Staff On Duty</h2>
+        <table className="w-full">
+          <thead>
+            <tr className="text-left text-gray-600 text-xs">
+              <th className="pb-2">Time</th>
+              <th className="pb-2">Name</th>
+              <th className="pb-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {diningStaff.map((shift, idx) => (
+              <tr key={idx} className="border-t border-gray-100">
+                <td className="py-2 text-gray-600">{shift.shift_start} - {shift.shift_end}</td>
+                <td className="py-2 text-gray-600">{shift.users ? `${shift.users.first_name} ${shift.users.last_name}` : shift.staff_name}</td>
+                <td className="py-2">
+                  <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Out</span>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {diningStaff.map((staff, index) => (
-                <tr key={index} className="border-t border-gray-100">
-                  <td className="py-2 text-gray-600">{staff.time}</td>
-                  <td className="py-2">{`${staff.first_name} ${staff.last_name}`}</td>
-                  <td className="py-2">
-                    {staff.status && (
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        staff.status === 'In' 
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {staff.status}
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Kitchen Section */}
-        <div>
-          <h3 className="text-gray-400 mb-2">Kitchen</h3>
-          <table className="w-full">
-            <thead>
-              <tr className="text-left text-gray-600">
-                <th className="pb-2">Time</th>
-                <th className="pb-2">Name</th>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {/* Kitchen Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4 text-gray-800">Kitchen Staff On Duty</h2>
+        <table className="w-full">
+          <thead>
+            <tr className="text-left text-gray-600 text-xs">
+              <th className="pb-2">Time</th>
+              <th className="pb-2">Name</th>
+              <th className="pb-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {kitchenStaff.map((shift, idx) => (
+              <tr key={idx} className="border-t border-gray-100">
+                <td className="py-2 text-gray-600">{shift.shift_start} - {shift.shift_end}</td>
+                <td className="py-2 text-gray-600">{shift.users ? `${shift.users.first_name} ${shift.users.last_name}` : shift.staff_name}</td>
+                <td className="py-2">
+                  <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Out</span>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {kitchenStaff.map((staff, index) => (
-                <tr key={index} className="border-t border-gray-100">
-                  <td className="py-2 text-gray-600">{staff.time}</td>
-                  <td className="py-2">{`${staff.first_name} ${staff.last_name}`}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Request Today Section */}
@@ -92,7 +95,7 @@ function UserDashboard() {
             <div key={index} className="border-t border-gray-100 pt-4 first:border-0 first:pt-0">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-medium">{request.type}</h3>
+                  <h3 className="font-medium text-gray-800 text-xs">{request.type}</h3>
                   <p className="text-gray-600">
                     {request.user}
                     {request.amount && ` - ${request.amount}`}
