@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import useAuth from '../hooks/useAuth'
 import { useState } from 'react'
 import logo from '../assets/logo-cm.png'
-import { LayoutDashboard, Users, UserCog, Receipt, Package, Calendar, Home } from 'lucide-react'
+import { LayoutDashboard, Users, UserCog, Receipt, Package, Calendar, Home, Clock } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
 
 // Custom Peso Receipt Icon
@@ -88,6 +88,18 @@ function AdminLayout() {
             >
               <Users className={`w-6 h-6 mb-2 ${isActive('/admin/users') ? 'text-orange-400' : 'text-orange-400/70'}`} />
               <span className={`text-xs ${isActive('/admin/users') ? 'text-orange-400' : 'text-white'}`}>Users</span>
+            </Link>
+
+            <Link
+              to="/admin/attendance"
+              className={`flex flex-col items-center px-2 py-3 rounded-lg transition-colors ${
+                isActive('/admin/attendance')
+                  ? 'bg-green-400/10 text-green-400'
+                  : 'hover:bg-gray-800'
+              }`}
+            >
+              <Clock className={`w-6 h-6 mb-2 ${isActive('/admin/attendance') ? 'text-green-400' : 'text-green-400/70'}`} />
+              <span className={`text-xs ${isActive('/admin/attendance') ? 'text-green-400' : 'text-white'}`}>Attendance</span>
             </Link>
 
             <Link

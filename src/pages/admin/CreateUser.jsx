@@ -144,7 +144,7 @@ function CreateUser({ isOpen, onClose }) {
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  className="block w-full pl-10 pr-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="John"
                   required
                 />
@@ -165,7 +165,7 @@ function CreateUser({ isOpen, onClose }) {
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  className="block w-full pl-10 pr-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Doe"
                   required
                 />
@@ -187,7 +187,7 @@ function CreateUser({ isOpen, onClose }) {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full pl-10 pr-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 placeholder="john@example.com"
                 required
               />
@@ -208,7 +208,7 @@ function CreateUser({ isOpen, onClose }) {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full pl-10 pr-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 placeholder="johndoe"
                 required
               />
@@ -229,7 +229,7 @@ function CreateUser({ isOpen, onClose }) {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="block w-full pl-10 pr-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full pl-10 pr-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 placeholder="••••••••"
                 required
                 autoComplete="new-password"
@@ -252,7 +252,7 @@ function CreateUser({ isOpen, onClose }) {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="block w-full pl-4 pr-10 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full pl-4 pr-10 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               >
                 <option value="">Select a role</option>
@@ -278,7 +278,7 @@ function CreateUser({ isOpen, onClose }) {
                 name="department"
                 value={formData.department}
                 onChange={handleChange}
-                className="block w-full pl-4 pr-10 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full pl-4 pr-10 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               >
                 <option value="">Select a department</option>

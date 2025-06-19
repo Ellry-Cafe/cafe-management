@@ -72,14 +72,14 @@ function UserManagementTabs({ activeTab, onTabChange, onAddUser }) {
               <input
                 type="text"
                 placeholder="Search users..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-500"
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 text-gray-600 border border-gray-200 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 placeholder-gray-500"
               />
             </div>
             <div className="w-48">
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <select
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 appearance-none text-gray-900 cursor-pointer"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 text-gray-600 border border-gray-200 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 appearance-none cursor-pointer"
                 >
                   <option value="" className="text-gray-500">Select a role</option>
                   <option value="admin">Admin</option>

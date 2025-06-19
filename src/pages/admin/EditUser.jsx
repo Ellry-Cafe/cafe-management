@@ -188,7 +188,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="first_name"
                 value={formData.first_name}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               />
             </div>
@@ -202,7 +202,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="last_name"
                 value={formData.last_name}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               />
             </div>
@@ -216,7 +216,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="contact_number"
                 value={formData.contact_number}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
 
@@ -229,7 +229,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="emergency_contact"
                 value={formData.emergency_contact}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
 
@@ -242,7 +242,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="birthdate"
                 value={formData.birthdate}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
 
@@ -255,7 +255,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="present_address"
                 value={formData.present_address}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
           </div>
@@ -271,7 +271,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               />
             </div>
@@ -285,7 +285,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               />
             </div>
@@ -300,7 +300,7 @@ function EditUser({ isOpen, onClose, user }) {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Leave blank to keep current"
                 />
                 <button
@@ -327,7 +327,7 @@ function EditUser({ isOpen, onClose, user }) {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Leave blank to keep current"
                 />
                 <button
@@ -355,7 +355,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 required
               >
                 <option value="">Select a role</option>
@@ -380,7 +380,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="department"
                 value={formData.department}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="">Select department</option>
                 {Object.entries(DEPARTMENTS).map(([value, label]) => (
@@ -400,7 +400,7 @@ function EditUser({ isOpen, onClose, user }) {
                 name="start_date"
                 value={formData.start_date}
                 onChange={handleChange}
-                className="block w-full px-4 py-2.5 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
           </div>

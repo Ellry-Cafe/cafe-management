@@ -166,4 +166,10 @@ export function AuthProvider({ children }) {
       {!loading && children}
     </AuthContext.Provider>
   )
+}
+
+// Add the useAuth hook export
+import { useContext } from 'react'
+export function useAuth() {
+  return useContext(AuthContext)
 } 

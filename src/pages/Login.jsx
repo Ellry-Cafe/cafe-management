@@ -66,7 +66,7 @@ function Login() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-sm bg-gray-100 text-black focus:bg-white focus:ring-1 focus:ring-black focus:outline-none disabled:opacity-50"
+              className="w-full px-4 py-3 rounded-sm bg-gray-50 text-gray-600 focus:bg-white focus:ring-1 focus:ring-black focus:outline-none disabled:opacity-50 border border-gray-300"
               placeholder="Enter your email"
               required
               disabled={loading}
@@ -82,7 +82,7 @@ function Login() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-sm bg-gray-100 text-black focus:bg-white focus:ring-1 focus:ring-black focus:outline-none disabled:opacity-50"
+              className="w-full px-4 py-3 rounded-sm bg-gray-50 text-gray-600 focus:bg-white focus:ring-1 focus:ring-black focus:outline-none disabled:opacity-50 border border-gray-300"
               placeholder="Enter your password"
               required
               disabled={loading}

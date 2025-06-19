@@ -9,6 +9,11 @@ import ErrorBoundary from './components/ErrorBoundary'
 import AdminLayout from './layouts/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import UserManagement from './pages/admin/UserManagement'
+import StaffAttendance from './pages/StaffAttendance'
+import AttendanceKiosk from './pages/AttendanceKiosk'
+import StaffAttendanceLogin from './pages/StaffAttendanceLogin'
+import StaffAttendanceHome from './pages/StaffAttendanceHome'
+import StaffAttendanceRequest from './pages/StaffAttendanceRequest'
 import Login from './pages/Login'
 
 function App() {
@@ -19,6 +24,10 @@ function App() {
           <Routes>
             {/* Public Route */}
             <Route path="/login" element={<Login />} />
+            <Route path="/attendance" element={<AttendanceKiosk />} />
+            <Route path="/staff-attendance/login" element={<StaffAttendanceLogin />} />
+            <Route path="/staff-attendance/home" element={<StaffAttendanceHome />} />
+            <Route path="/staff-attendance/request" element={<StaffAttendanceRequest />} />
 
             {/* Protected Admin Routes */}
             <Route
@@ -31,6 +40,7 @@ function App() {
             >
               <Route index element={<Dashboard />} />
               <Route path="users" element={<UserManagement />} />
+              <Route path="attendance" element={<StaffAttendance />} />
             </Route>
 
             {/* Redirect to login */}
