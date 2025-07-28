@@ -42,7 +42,7 @@ const DEPARTMENTS = {
   inventory: 'Inventory'
 }
 
-function Users() {
+function Users({ refreshKey, onUserUpdated, onUserDeleted }) {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState(null)
@@ -57,7 +57,7 @@ function Users() {
 
   useEffect(() => {
     fetchUsers()
-  }, [currentPage])
+  }, [currentPage, refreshKey])
 
   const fetchUsers = async () => {
     try {
@@ -106,7 +106,7 @@ function Users() {
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false)
     setSelectedUser(null)
-    fetchUsers() // Refresh the list after editing
+    // No fetchUsers here; rely on parent refresh
   }
 
   const getFileStatus = (user) => {
@@ -137,7 +137,7 @@ function Users() {
       toast.success('User deleted successfully')
       setDeleteModalOpen(false)
       setUserToDelete(null)
-      fetchUsers() // Refresh the list
+      if (onUserDeleted) onUserDeleted()
     } catch (error) {
       console.error('Error deleting user:', error)
       toast.error('Failed to delete user')
@@ -156,6 +156,7 @@ function Users() {
           <table className="min-w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Number</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
@@ -186,6 +187,9 @@ function Users() {
                   const fileStatus = getFileStatus(user)
                   return (
                     <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{user.id_number || '-'}</div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{`${user.first_name} ${user.last_name}`}</div>
                       </td>
@@ -311,6 +315,7 @@ function Users() {
           isOpen={isEditModalOpen}
           onClose={handleCloseEditModal}
           user={selectedUser}
+          onUserUpdated={onUserUpdated}
         />
       )}
 

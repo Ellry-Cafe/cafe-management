@@ -1,3 +1,5 @@
+import { convertTo12Hour } from '../../utils/timeUtils';
+
 const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 
 function ScheduleTable({ schedules, onEdit, onDelete }) {
@@ -34,7 +36,7 @@ function ScheduleTable({ schedules, onEdit, onDelete }) {
                     <div className="flex flex-col gap-1">
                       {shiftsByDay[day].map((shift, idx) => (
                         <div key={idx}>
-                          {shift.shift_start} - {shift.shift_end}
+                          {convertTo12Hour(shift.shift_start)} - {convertTo12Hour(shift.shift_end)}
                         </div>
                       ))}
                     </div>

@@ -11,7 +11,7 @@ const DEPARTMENTS = {
   inventory: 'Inventory'
 }
 
-function CreateUser({ isOpen, onClose }) {
+function CreateUser({ isOpen, onClose, onUserCreated }) {
   const initialFormState = {
     first_name: '',
     last_name: '',
@@ -39,7 +39,26 @@ function CreateUser({ isOpen, onClose }) {
 
     try {
       const fullName = `${formData.first_name} ${formData.last_name}`.trim()
-      
+      const year = new Date().getFullYear().toString()
+      // Get the highest id_number for this year
+      const { data: usersWithId, error: idQueryError } = await supabaseAdmin
+        .from('users')
+        .select('id_number')
+        .ilike('id_number', `${year}%`)
+        .order('id_number', { ascending: false })
+        .limit(1)
+      if (idQueryError) throw idQueryError
+      let nextNum = 1
+      if (usersWithId && usersWithId.length > 0 && usersWithId[0].id_number) {
+        const lastIdNum = usersWithId[0].id_number.slice(4, 7)
+        nextNum = parseInt(lastIdNum, 10) + 1
+      }
+      const numStr = nextNum.toString().padStart(3, '0')
+      const firstName = formData.first_name.trim()
+      let last3 = firstName.slice(-3).toUpperCase()
+      if (firstName.length < 3) last3 = firstName.toUpperCase()
+      const id_number = `${year}${numStr}${last3}`
+
       console.log('Creating new user:', {
         email: formData.email,
         role: formData.role,
@@ -58,7 +77,8 @@ function CreateUser({ isOpen, onClose }) {
           last_name: formData.last_name,
           username: formData.username,
           role: formData.role,
-          department: formData.department
+          department: formData.department,
+          id_number: id_number
         }
       })
 
@@ -79,7 +99,8 @@ function CreateUser({ isOpen, onClose }) {
           department: formData.department,
           first_name: formData.first_name,
           last_name: formData.last_name,
-          name: fullName
+          name: fullName,
+          id_number: id_number
         })
         .eq('id', authData.user.id)
 
@@ -99,7 +120,11 @@ function CreateUser({ isOpen, onClose }) {
 
       toast.success('User created successfully!')
       resetForm()
-      onClose() // Close the modal after successful creation
+      if (onUserCreated) {
+        onUserCreated()
+      } else {
+        onClose()
+      }
 
     } catch (error) {
       console.error('Error creating user:', error)

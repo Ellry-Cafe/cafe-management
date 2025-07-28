@@ -10,9 +10,23 @@ function UserManagement() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
+  const [usersRefreshKey, setUsersRefreshKey] = useState(0)
 
   const handleAddUser = () => {
     setCreateModalOpen(true)
+  }
+
+  const handleUserCreated = () => {
+    setUsersRefreshKey((k) => k + 1)
+    setCreateModalOpen(false)
+  }
+
+  const handleUserUpdated = () => {
+    setUsersRefreshKey((k) => k + 1)
+  }
+
+  const handleUserDeleted = () => {
+    setUsersRefreshKey((k) => k + 1)
   }
 
   const handleTabChange = (tabId) => {
@@ -24,7 +38,7 @@ function UserManagement() {
       case 'dashboard':
         return <UserDashboard />
       case 'profile':
-        return <Users />
+        return <Users refreshKey={usersRefreshKey} onUserUpdated={handleUserUpdated} onUserDeleted={handleUserDeleted} />
       case 'schedule':
         return <ScheduleTab />
       case 'attendance':
@@ -59,6 +73,7 @@ function UserManagement() {
       <CreateUser 
         isOpen={createModalOpen} 
         onClose={() => setCreateModalOpen(false)} 
+        onUserCreated={handleUserCreated}
       />
 
     <AddScheduleModal

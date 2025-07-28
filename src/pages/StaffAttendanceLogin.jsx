@@ -25,10 +25,11 @@ const StaffAttendanceLogin = () => {
       }
       // Redirect to home page with id_number as query param
       navigate(`/staff-attendance/home?id_number=${encodeURIComponent(idNumber)}`)
+      setLoading(false) // Call this after navigation
     } catch {
       setError('Error looking up user.')
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { addSchedule, deleteSchedulesForStaffDept } from '../../api/schedules';
 import { supabaseAdmin } from '../../config/supabase';
 import { X, CalendarPlus, Plus, Trash2 } from 'lucide-react';
+import { convertTo24Hour, convertTo12Hour } from '../../utils/timeUtils';
 
 const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const departments = ['dining', 'kitchen'];
@@ -50,7 +51,10 @@ export default function AddScheduleModal({ open, onClose, onCreated, editingSche
         const prefill = days.reduce((acc, day) => {
           const dayShifts = (editingSchedule.schedules || []).filter(s => s.day_of_week === day);
           acc[day] = dayShifts.length > 0
-            ? dayShifts.map(s => ({ start: s.shift_start, end: s.shift_end }))
+            ? dayShifts.map(s => ({ 
+                start: convertTo12Hour(s.shift_start), 
+                end: convertTo12Hour(s.shift_end) 
+              }))
             : [{ start: '', end: '' }];
           return acc;
         }, {});
@@ -106,12 +110,16 @@ export default function AddScheduleModal({ open, onClose, onCreated, editingSche
           shift.start &&
           shift.end
         ) {
+          // Convert AM/PM times to 24-hour format before saving
+          const shiftStart24h = convertTo24Hour(shift.start);
+          const shiftEnd24h = convertTo24Hour(shift.end);
+          
           const { error } = await addSchedule({
             staff_id: staffId,
             department,
             day_of_week: day,
-            shift_start: shift.start,
-            shift_end: shift.end,
+            shift_start: shiftStart24h,
+            shift_end: shiftEnd24h,
           });
           if (error) {
             alert('Error saving schedule: ' + error.message);

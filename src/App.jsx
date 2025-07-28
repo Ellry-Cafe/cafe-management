@@ -14,7 +14,10 @@ import AttendanceKiosk from './pages/AttendanceKiosk'
 import StaffAttendanceLogin from './pages/StaffAttendanceLogin'
 import StaffAttendanceHome from './pages/StaffAttendanceHome'
 import StaffAttendanceRequest from './pages/StaffAttendanceRequest'
+import StaffAttendanceHistory from './pages/StaffAttendanceHistory'
 import Login from './pages/Login'
+import StaffAttendanceSchedule from './pages/StaffAttendanceSchedule'
+import Logout from './pages/Logout'
 
 function App() {
   return (
@@ -28,6 +31,9 @@ function App() {
             <Route path="/staff-attendance/login" element={<StaffAttendanceLogin />} />
             <Route path="/staff-attendance/home" element={<StaffAttendanceHome />} />
             <Route path="/staff-attendance/request" element={<StaffAttendanceRequest />} />
+            <Route path="/staff-attendance/history" element={<StaffAttendanceHistory />} />
+            <Route path="/staff-attendance/schedule" element={<StaffAttendanceSchedule />} />
+            <Route path="/logout" element={<Logout />} />
 
             {/* Protected Admin Routes */}
             <Route

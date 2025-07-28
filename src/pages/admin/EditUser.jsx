@@ -12,7 +12,7 @@ const DEPARTMENTS = {
   inventory: 'Inventory'
 }
 
-function EditUser({ isOpen, onClose, user }) {
+function EditUser({ isOpen, onClose, user, onUserUpdated }) {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -148,6 +148,7 @@ function EditUser({ isOpen, onClose, user }) {
       }
 
       toast.success('User updated successfully!')
+      if (onUserUpdated) onUserUpdated()
       onClose() // Close the modal after successful update
 
     } catch (error) {
